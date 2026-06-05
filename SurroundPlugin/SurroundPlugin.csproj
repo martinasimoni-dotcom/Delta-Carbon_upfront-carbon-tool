@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <OutputType>Library</OutputType>
+    <AssemblyName>SurroundPlugin</AssemblyName>
+    <RootNamespace>SurroundPlugin</RootNamespace>
+    <AssemblyTitle>SURROUND Carbon Plugin for Rhino</AssemblyTitle>
+    <Company>SURROUND</Company>
+    <Product>SURROUND Carbon</Product>
+    <Description>Real-time embodied carbon assessment for Rhino 7/8</Description>
+    <PlatformTarget>x64</PlatformTarget>
+    <Platforms>x64</Platforms>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <!-- Default Rhino 8 install path — override via RhinoInstallPath env var or Directory.Build.props -->
+    <RhinoInstallPath Condition="'$(RhinoInstallPath)' == ''">C:\Program Files\Rhino 8\System</RhinoInstallPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <!-- .NET Framework assemblies not auto-referenced in SDK-style projects -->
+  <ItemGroup>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <!-- Rhino DLL references — not copied to output (shipped with Rhino) -->
+  <ItemGroup>
+    <Reference Include="RhinoCommon">
+      <HintPath>$(RhinoInstallPath)\RhinoCommon.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Rhino.UI">
+      <HintPath>$(RhinoInstallPath)\Rhino.UI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Eto">
+      <HintPath>$(RhinoInstallPath)\Eto.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>$(RhinoInstallPath)\Newtonsoft.Json.Rhino.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- After build: copy .dll → .rhp so Rhino can drag-and-drop install it -->
+  <Target Name="CopyToRhp" AfterTargets="Build">
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
+          DestinationFiles="$(OutputPath)$(AssemblyName).rhp"
+          SkipUnchangedFiles="true" />
+    <Message Text="SURROUND: Output → $(OutputPath)$(AssemblyName).rhp" Importance="high" />
+  </Target>
+
+</Project>
