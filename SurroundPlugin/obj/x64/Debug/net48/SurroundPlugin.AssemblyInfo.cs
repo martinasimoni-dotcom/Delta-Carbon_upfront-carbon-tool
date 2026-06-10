@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Real-time embodied carbon assessment for Rhino 7/8")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a4128e236976f9df38b548566d67d3581da0b12b")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+07d98bd5900f8db00de0e68cf74cf0cc8821506e")]
 [assembly: System.Reflection.AssemblyProductAttribute("SURROUND Carbon")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SURROUND Carbon Plugin for Rhino")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
