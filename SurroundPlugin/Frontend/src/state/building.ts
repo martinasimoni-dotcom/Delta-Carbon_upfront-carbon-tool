@@ -60,6 +60,7 @@ type State = {
   placeBuilding: () => void;
   clearPlacedBuilding: () => void;
   setDims: (d: Partial<BuildingDims>) => void;
+  loadFromRhino: (dims: BuildingDims, volumes: Array<{ id: string; volumeM3: number }>, location?: { lat: number; lon: number } | null) => void;
   setMaterial: (elementId: string, materialId: string) => void;
   setVolume: (elementId: string, volumeM3: number) => void;
   loadModel: (url: string, kind: "obj" | "gltf", name: string) => void;
@@ -95,6 +96,42 @@ export const useBuilding = create<State>((set) => ({
     set((s) => {
       const dims = { ...s.dims, ...d };
       return { dims, elements: buildDefaultElements(dims).map((ne, i) => ({ ...ne, materialId: s.elements[i]?.materialId ?? ne.materialId })) };
+    }),
+  loadFromRhino: (dims, volumes, location) =>
+    set((s) => {
+      const elements = buildDefaultElements(dims).map((ne, i) => ({
+        ...ne,
+        materialId: s.elements[i]?.materialId ?? ne.materialId,
+        volumeM3: volumes.find((v) => v.id === ne.id)?.volumeM3 ?? ne.volumeM3,
+      }));
+      if (!location) return { dims, elements };
+
+      // Compute footprint polygon from Rhino dims + location for the map extrusion
+      const mPerDegLat = 111320;
+      const mPerDegLng = 111320 * Math.cos((location.lat * Math.PI) / 180);
+      const halfWdeg = dims.width / 2 / mPerDegLng;
+      const halfDdeg = dims.depth / 2 / mPerDegLat;
+      const plotCoords: [number, number][] = [
+        [location.lon - halfWdeg, location.lat - halfDdeg],
+        [location.lon + halfWdeg, location.lat - halfDdeg],
+        [location.lon + halfWdeg, location.lat + halfDdeg],
+        [location.lon - halfWdeg, location.lat + halfDdeg],
+        [location.lon - halfWdeg, location.lat - halfDdeg],
+      ];
+      return {
+        dims,
+        elements,
+        plotCenter: location,
+        searchLocation: { name: "Rhino model", lat: location.lat, lon: location.lon },
+        selectedParcel: {
+          id: "rhino-sync",
+          codi: "Rhino Model",
+          area: dims.width * dims.depth,
+          maxHeightM: dims.height,
+          plotCoords,
+        },
+        buildingPlaced: dims.width > 0 && dims.height > 0,
+      };
     }),
   setMaterial: (elementId, materialId) =>
     set((s) => ({ elements: s.elements.map((e) => (e.id === elementId ? { ...e, materialId } : e)) })),

@@ -2,6 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { useBuilding } from "@/state/building";
 
+async function sendPlotToRhino(lat: number, lon: number, id: string | number) {
+  await fetch("/api/plot/select", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ lat, lon, id }),
+  });
+}
+
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoibWFydHNpbW85IiwiYSI6ImNtcDQweDJveTAwdHoyeHA2NHo2dWFwbjEifQ.m6hBtHEzpTEF15rpy0QjfA";
 
@@ -11,8 +19,10 @@ export function MapInfoSection() {
   const searchLocation = useBuilding((s) => s.searchLocation);
   const setSearchLocation = useBuilding((s) => s.setSearchLocation);
   const selectedParcel = useBuilding((s) => s.selectedParcel);
-  const buildingPlaced = useBuilding((s) => s.buildingPlaced);
-  const placeBuilding = useBuilding((s) => s.placeBuilding);
+  const plotCenter = useBuilding((s) => s.plotCenter);
+  const [sent, setSent] = useState(false);
+
+  useEffect(() => { setSent(false); }, [selectedParcel]);
 
   const [query, setQuery] = useState(searchLocation?.name ?? "");
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -107,17 +117,26 @@ export function MapInfoSection() {
             {selectedParcel.maxHeightM && (
               <Row k="Max height" v={`${selectedParcel.maxHeightM} m`} mono />
             )}
-            {!buildingPlaced ? (
+            {!sent ? (
               <button
-                onClick={placeBuilding}
-                disabled={!selectedParcel.plotCoords?.length}
+                onClick={async () => {
+                  if (!plotCenter) return;
+                  await sendPlotToRhino(plotCenter.lat, plotCenter.lon, selectedParcel.id);
+                  setSent(true);
+                }}
+                disabled={!plotCenter}
                 className="mt-3 w-full rounded-md bg-[#2C5F4C] px-3 py-2.5 text-xs font-semibold uppercase tracking-wider text-white transition hover:bg-[#1F4435] disabled:opacity-50"
               >
-                📍 Place Building on Plot
+                Send to Rhino
               </button>
             ) : (
-              <div className="mt-3 flex items-center gap-2 rounded-md bg-[#E8F5E9] px-3 py-2 text-xs font-medium text-[#2C5F4C]">
-                <span>✓</span> Building placed on plot
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center gap-2 rounded-md bg-[#E8F5E9] px-3 py-2 text-xs font-medium text-[#2C5F4C]">
+                  <span>✓</span> Plot sent — run <span className="font-mono font-bold">SurroundSetOrigin</span> in Rhino
+                </div>
+                <div className="text-[10px] text-muted-foreground">
+                  Then build your model at (0,0,0) and run <span className="font-mono font-bold">SurroundSync</span> to sync.
+                </div>
               </div>
             )}
           </>

@@ -55,9 +55,6 @@ export function MapView({ onPlotClick }: { onPlotClick: () => void }) {
   const [minArea, setMinArea] = useState(0);
   const [minFloors, setMinFloors] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [drawCount, setDrawCount] = useState(0);
-  const drawPointsRef = useRef<[number, number][]>([]);
   const buildingMetaRef = useRef<{ w: number; h: number; height: number; center: [number, number]; rotation: number } | null>(null);
   const [rotation, setRotation] = useState(0);
   const [heightM, setHeightM] = useState(30);
@@ -272,38 +269,6 @@ export function MapView({ onPlotClick }: { onPlotClick: () => void }) {
         paint: { "line-color": "#2C5F4C", "line-width": 3 },
       });
 
-      // In-progress drawing source (line + fill + vertex circles)
-      m.addSource("draw-plot", {
-        type: "geojson",
-        data: { type: "FeatureCollection", features: [] } as FeatureCollection,
-      });
-      m.addLayer({
-        id: "draw-plot-fill",
-        type: "fill",
-        source: "draw-plot",
-        filter: ["==", "$type", "Polygon"],
-        paint: { "fill-color": "#E8A33D", "fill-opacity": 0.2 },
-      });
-      m.addLayer({
-        id: "draw-plot-line",
-        type: "line",
-        source: "draw-plot",
-        filter: ["!=", "$type", "Point"],
-        paint: { "line-color": "#E8A33D", "line-width": 2, "line-dasharray": [2, 2] },
-      });
-      m.addLayer({
-        id: "draw-plot-vertex",
-        type: "circle",
-        source: "draw-plot",
-        filter: ["==", "$type", "Point"],
-        paint: {
-          "circle-radius": 5,
-          "circle-color": "#FFFFFF",
-          "circle-stroke-color": "#E8A33D",
-          "circle-stroke-width": 2,
-        },
-      });
-
       // Load static plots and render green dot markers for available ones
       const data = await loadStaticPlots().catch(
         () => ({ type: "FeatureCollection", features: [] }) as FeatureCollection,
@@ -510,131 +475,6 @@ export function MapView({ onPlotClick }: { onPlotClick: () => void }) {
     writeBuildingFootprint(m, false);
   }, [rotation, heightM, widthScale, depthScale, buildingPlaced]);
 
-  // Render in-progress drawing into the "draw-plot" source
-  function renderDraw(m: mapboxgl.Map) {
-    const pts = drawPointsRef.current;
-    const features: FeatureCollection["features"] = pts.map((p, i) => ({
-      type: "Feature",
-      properties: { i },
-      geometry: { type: "Point", coordinates: p },
-    }));
-    if (pts.length >= 2) {
-      features.push({
-        type: "Feature",
-        properties: {},
-        geometry: { type: "LineString", coordinates: pts },
-      });
-    }
-    if (pts.length >= 3) {
-      features.push({
-        type: "Feature",
-        properties: {},
-        geometry: { type: "Polygon", coordinates: [[...pts, pts[0]]] },
-      });
-    }
-    const src = m.getSource("draw-plot") as mapboxgl.GeoJSONSource | undefined;
-    if (src) src.setData({ type: "FeatureCollection", features });
-  }
-
-  function clearDraw(m: mapboxgl.Map) {
-    drawPointsRef.current = [];
-    setDrawCount(0);
-    const src = m.getSource("draw-plot") as mapboxgl.GeoJSONSource | undefined;
-    if (src) src.setData({ type: "FeatureCollection", features: [] });
-  }
-
-  function finishDraw() {
-    const m = map.current;
-    if (!m) return;
-    const pts = drawPointsRef.current;
-    if (pts.length < 3) return;
-    const ring: Position[] = [...pts.map((p) => [p[0], p[1]] as Position), [pts[0][0], pts[0][1]] as Position];
-    const [cLng, cLat] = centroidOf(ring);
-    const area = ringApproxAreaM2(ring);
-
-    // Show as highlighted plot
-    const highlightSrc = m.getSource("highlight-plot") as mapboxgl.GeoJSONSource | undefined;
-    if (highlightSrc) {
-      highlightSrc.setData({
-        type: "FeatureCollection",
-        features: [{
-          type: "Feature",
-          properties: {},
-          geometry: { type: "Polygon", coordinates: [ring] },
-        }],
-      } as FeatureCollection);
-    }
-
-    setSelectedParcel({
-      id: `custom-${Date.now()}`,
-      codi: "Custom plot",
-      area,
-      plotCoords: ring.map((c) => [c[0], c[1]] as [number, number]),
-    });
-    setPlotCenter({ lat: cLat, lon: cLng });
-
-    // Remove any previously placed building
-    if (m.getLayer("demo-building-3d")) m.removeLayer("demo-building-3d");
-    if (m.getSource("demo-building")) m.removeSource("demo-building");
-
-    clearDraw(m);
-    setIsDrawing(false);
-
-    const bounds = new mapboxgl.LngLatBounds();
-    ring.forEach((c) => bounds.extend(c as [number, number]));
-    m.fitBounds(bounds, {
-      padding: { top: 100, bottom: 100, left: 100, right: 450 },
-      pitch: 70,
-      duration: 1200,
-      essential: true,
-    });
-    m.once("moveend", () => onPlotClickRef.current());
-  }
-
-  // Drawing mode: capture clicks as polygon vertices
-  useEffect(() => {
-    const m = map.current;
-    if (!m || !parcelsLoaded) return;
-    if (!isDrawing) return;
-
-    const canvas = m.getCanvas();
-    canvas.style.cursor = "crosshair";
-    m.doubleClickZoom.disable();
-
-    const onClick = (e: mapboxgl.MapMouseEvent) => {
-      drawPointsRef.current = [...drawPointsRef.current, [e.lngLat.lng, e.lngLat.lat]];
-      setDrawCount(drawPointsRef.current.length);
-      renderDraw(m);
-    };
-    const onDblClick = (e: mapboxgl.MapMouseEvent) => {
-      e.preventDefault();
-      if (drawPointsRef.current.length >= 3) finishDraw();
-    };
-    const onKey = (ev: KeyboardEvent) => {
-      if (ev.key === "Escape") {
-        clearDraw(m);
-        setIsDrawing(false);
-      } else if (ev.key === "Enter") {
-        if (drawPointsRef.current.length >= 3) finishDraw();
-      } else if (ev.key === "Backspace") {
-        drawPointsRef.current = drawPointsRef.current.slice(0, -1);
-        setDrawCount(drawPointsRef.current.length);
-        renderDraw(m);
-      }
-    };
-
-    m.on("click", onClick);
-    m.on("dblclick", onDblClick);
-    window.addEventListener("keydown", onKey);
-
-    return () => {
-      m.off("click", onClick);
-      m.off("dblclick", onDblClick);
-      window.removeEventListener("keydown", onKey);
-      canvas.style.cursor = "";
-      m.doubleClickZoom.enable();
-    };
-  }, [isDrawing, parcelsLoaded]);
 
 
   return (
@@ -735,94 +575,6 @@ export function MapView({ onPlotClick }: { onPlotClick: () => void }) {
         </div>
       )}
 
-      {/* Draw plot controls */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: 36,
-          left: 16,
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-          zIndex: 20,
-        }}
-      >
-        {!isDrawing ? (
-          <button
-            onClick={() => {
-              const m = map.current;
-              if (m) clearDraw(m);
-              setIsDrawing(true);
-            }}
-            style={{
-              background: "#E8A33D",
-              color: "white",
-              border: "none",
-              borderRadius: 6,
-              padding: "8px 14px",
-              fontSize: 12,
-              fontWeight: 600,
-              cursor: "pointer",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-            }}
-          >
-            ✏️ Draw plot
-          </button>
-        ) : (
-          <>
-            <div
-              style={{
-                background: "rgba(255,255,255,0.95)",
-                color: "#2C5F4C",
-                padding: "8px 12px",
-                borderRadius: 6,
-                fontSize: 12,
-                fontWeight: 500,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-              }}
-            >
-              {drawCount} point{drawCount === 1 ? "" : "s"} · click to add · double-click or Enter to finish · Backspace to undo · Esc to cancel
-            </div>
-            <button
-              onClick={finishDraw}
-              disabled={drawCount < 3}
-              style={{
-                background: drawCount < 3 ? "#A0A0A0" : "#2C5F4C",
-                color: "white",
-                border: "none",
-                borderRadius: 6,
-                padding: "8px 14px",
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: drawCount < 3 ? "not-allowed" : "pointer",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-              }}
-            >
-              ✓ Finish
-            </button>
-            <button
-              onClick={() => {
-                const m = map.current;
-                if (m) clearDraw(m);
-                setIsDrawing(false);
-              }}
-              style={{
-                background: "rgba(255,255,255,0.95)",
-                color: "#B85450",
-                border: "1px solid #B85450",
-                borderRadius: 6,
-                padding: "8px 14px",
-                fontSize: 12,
-                fontWeight: 600,
-                cursor: "pointer",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-              }}
-            >
-              ✕ Cancel
-            </button>
-          </>
-        )}
-      </div>
 
       <div
         style={{

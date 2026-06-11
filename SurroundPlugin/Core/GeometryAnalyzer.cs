@@ -174,10 +174,12 @@ namespace SurroundPlugin.Core
             try
             {
                 var bbox = BoundingBox.Empty;
+                // Only use Brep/Extrusion geometry — ignore curves, points, annotations, etc.
                 var settings = new ObjectEnumeratorSettings
                 {
                     VisibleFilter = true,
-                    LockedObjects = false
+                    LockedObjects = false,
+                    ObjectTypeFilter = ObjectType.Brep | ObjectType.Extrusion
                 };
 
                 foreach (var obj in doc.Objects.GetObjectList(settings))

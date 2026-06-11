@@ -5,20 +5,16 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { MapInfoSection } from "./sections/MapInfoSection";
-import { ImportSection } from "./sections/ImportSection";
-import { TransformSection } from "./sections/TransformSection";
 import { ElementsSection } from "./sections/ElementsSection";
 import { ResultsSection } from "./sections/ResultsSection";
 import { OptimizeSection } from "./sections/OptimizeSection";
 import { PlotUploadDialog } from "./PlotUploadDialog";
 
 const sections = [
-  { id: "site", n: "01", title: "Site", body: <MapInfoSection /> },
-  { id: "import", n: "02", title: "Import Model", body: <ImportSection /> },
-  { id: "transform", n: "03", title: "Placement", body: <TransformSection /> },
-  { id: "elements", n: "04", title: "Building Elements", body: <ElementsSection /> },
-  { id: "results", n: "05", title: "CO₂ Results", body: <ResultsSection /> },
-  { id: "optimize", n: "06", title: "Optimization", body: <OptimizeSection /> },
+  { id: "site",     n: "01", title: "Site",              body: <MapInfoSection /> },
+  { id: "elements", n: "02", title: "Building Elements", body: <ElementsSection /> },
+  { id: "results",  n: "03", title: "CO₂ Results",       body: <ResultsSection /> },
+  { id: "optimize", n: "04", title: "Optimization",      body: <OptimizeSection /> },
 ];
 
 export function Sidebar() {

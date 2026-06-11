@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicParcelsRouteImport } from './routes/api/public/parcels'
+import { Route as ApiPluginEstimateRouteImport } from './routes/api/plugin/estimate'
 
 const EvidenceRoute = EvidenceRouteImport.update({
   id: '/evidence',
@@ -28,34 +29,48 @@ const ApiPublicParcelsRoute = ApiPublicParcelsRouteImport.update({
   path: '/api/public/parcels',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPluginEstimateRoute = ApiPluginEstimateRouteImport.update({
+  id: '/api/plugin/estimate',
+  path: '/api/plugin/estimate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/evidence': typeof EvidenceRoute
+  '/api/plugin/estimate': typeof ApiPluginEstimateRoute
   '/api/public/parcels': typeof ApiPublicParcelsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/evidence': typeof EvidenceRoute
+  '/api/plugin/estimate': typeof ApiPluginEstimateRoute
   '/api/public/parcels': typeof ApiPublicParcelsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/evidence': typeof EvidenceRoute
+  '/api/plugin/estimate': typeof ApiPluginEstimateRoute
   '/api/public/parcels': typeof ApiPublicParcelsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/evidence' | '/api/public/parcels'
+  fullPaths: '/' | '/evidence' | '/api/plugin/estimate' | '/api/public/parcels'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/evidence' | '/api/public/parcels'
-  id: '__root__' | '/' | '/evidence' | '/api/public/parcels'
+  to: '/' | '/evidence' | '/api/plugin/estimate' | '/api/public/parcels'
+  id:
+    | '__root__'
+    | '/'
+    | '/evidence'
+    | '/api/plugin/estimate'
+    | '/api/public/parcels'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   EvidenceRoute: typeof EvidenceRoute
+  ApiPluginEstimateRoute: typeof ApiPluginEstimateRoute
   ApiPublicParcelsRoute: typeof ApiPublicParcelsRoute
 }
 
@@ -82,14 +97,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicParcelsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/plugin/estimate': {
+      id: '/api/plugin/estimate'
+      path: '/api/plugin/estimate'
+      fullPath: '/api/plugin/estimate'
+      preLoaderRoute: typeof ApiPluginEstimateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   EvidenceRoute: EvidenceRoute,
+  ApiPluginEstimateRoute: ApiPluginEstimateRoute,
   ApiPublicParcelsRoute: ApiPublicParcelsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
