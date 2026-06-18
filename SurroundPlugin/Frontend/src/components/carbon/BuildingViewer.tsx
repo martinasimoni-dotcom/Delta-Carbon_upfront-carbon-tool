@@ -24,7 +24,7 @@ export function BuildingViewer() {
     if (!mount) return;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x1a1a1a);
+    scene.background = new THREE.Color(0xd4d0c8);
 
     const camera = new THREE.PerspectiveCamera(
       45,
@@ -38,6 +38,9 @@ export function BuildingViewer() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.shadowMap.enabled = true;
+    // touch-action: none is required for OrbitControls pointer events on both
+    // touch devices and browsers that use pointer events (e.g. Chrome).
+    renderer.domElement.style.touchAction = "none";
     mount.appendChild(renderer.domElement);
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
@@ -46,12 +49,20 @@ export function BuildingViewer() {
     sun.castShadow = true;
     scene.add(sun);
 
-    const grid = new THREE.GridHelper(200, 20, 0x333333, 0x282828);
+    const grid = new THREE.GridHelper(200, 20, 0xa8a49c, 0xb8b4ac);
     scene.add(grid);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
+    controls.dampingFactor = 0.05;
+    controls.enablePan = true;
+    controls.enableZoom = true;
+    controls.rotateSpeed = 1.0;
+    controls.mouseButtons = {
+      LEFT: THREE.MOUSE.ROTATE,
+      MIDDLE: THREE.MOUSE.DOLLY,
+      RIGHT: THREE.MOUSE.PAN,
+    };
     controls.minDistance = 5;
     controls.maxDistance = 2000;
 
@@ -166,7 +177,7 @@ export function BuildingViewer() {
 
   return (
     <div className="relative w-full h-full">
-      <div ref={mountRef} className="w-full h-full" />
+      <div ref={mountRef} className="w-full h-full" style={{ touchAction: "none" }} />
 
       {waiting && (
         <div className="absolute inset-0 flex items-end justify-center pb-6 pointer-events-none">
