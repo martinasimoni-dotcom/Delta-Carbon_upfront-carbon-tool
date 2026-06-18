@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Drawing.Imaging;
 using System.IO;
 using Rhino;
@@ -13,6 +14,7 @@ namespace SurroundPlugin
     /// Plugin entry point. Rhino instantiates this class on load.
     /// Registers the carbon panel and exposes the shared APIClient singleton.
     /// </summary>
+    [Guid("8F3A2B1C-4D5E-6F7A-8B9C-0D1E2F3A4B5C")]
     public class SurroundPlugin : PlugIn
     {
         private static SurroundPlugin _instance;

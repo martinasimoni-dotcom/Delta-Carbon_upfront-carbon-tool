@@ -27,6 +27,7 @@ type Cache = {
 };
 let cache: Cache | null = null;
 let plotCache: { lat: number; lon: number; id: string | number } | null = null;
+let objCache: string | null = null;
 
 // Vite middleware plugin — intercepts plugin requests before @cloudflare/vite-plugin
 function rhinoBridge(): Plugin {
@@ -60,6 +61,48 @@ function rhinoBridge(): Plugin {
             });
             return;
           }
+          next();
+        },
+      );
+
+      // OBJ model upload/fetch bridge
+      server.middlewares.use(
+        "/api/model",
+        (req: IncomingMessage, res: ServerResponse, next: () => void) => {
+          const objHeaders = {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          };
+
+          if (req.method === "OPTIONS") {
+            res.writeHead(204, objHeaders); res.end(); return;
+          }
+
+          const url = req.url ?? "";
+
+          if (req.method === "POST" && url === "/upload") {
+            let body = "";
+            req.on("data", (chunk: Buffer) => { body += chunk.toString(); });
+            req.on("end", () => {
+              objCache = body;
+              res.writeHead(200, { ...objHeaders, "Content-Type": "application/json" });
+              res.end(JSON.stringify({ ok: true, bytes: body.length }));
+            });
+            return;
+          }
+
+          if (req.method === "GET" && url === "/current") {
+            if (!objCache) {
+              res.writeHead(404, { ...objHeaders, "Content-Type": "application/json" });
+              res.end(JSON.stringify({ error: "no_model" }));
+              return;
+            }
+            res.writeHead(200, { ...objHeaders, "Content-Type": "model/obj" });
+            res.end(objCache);
+            return;
+          }
+
           next();
         },
       );

@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { Header } from "@/components/carbon/Header";
 import { Footer } from "@/components/carbon/Footer";
 import { Sidebar } from "@/components/carbon/Sidebar";
-import { MapView } from "@/components/carbon/MapView";
+import { BuildingViewer } from "@/components/carbon/BuildingViewer";
 import { useBuilding } from "@/state/building";
 
 export const Route = createFileRoute("/")({
@@ -62,7 +62,6 @@ function usePlotBroadcast() {
 }
 
 function Index() {
-  const setUploadOpen = useBuilding((s) => s.setUploadOpen);
   useRhinoSync();
   usePlotBroadcast();
   return (
@@ -70,7 +69,7 @@ function Index() {
       <Header />
       <div className="flex flex-1 min-h-0">
         <main className="flex-1 min-w-0 relative">
-          <MapView onPlotClick={() => setUploadOpen(true)} />
+          <BuildingViewer />
         </main>
         <Sidebar />
       </div>
