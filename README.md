@@ -3,7 +3,7 @@
 Real-time embodied carbon assessment for Rhino 7/8 — massing stage, no LCA training required.
 
 **Team:** Bhavana Priya · Martina Simoni · Rashi Desadla · Rim Choufani  
-**Status:** Active development — branch `bhavana`
+**Status:** Active development 
 
 ---
 
