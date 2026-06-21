@@ -33,6 +33,8 @@ const buildDefaultElements = (d: BuildingDims): BuildingElement[] => {
 type State = {
   dims: BuildingDims;
   elements: BuildingElement[];
+  transportCo2Kg: number;
+  setTransportCo2Kg: (kg: number) => void;
   modelUrl: string | null;
   modelKind: "obj" | "gltf" | null;
   modelName: string | null;
@@ -75,6 +77,8 @@ type State = {
 export const useBuilding = create<State>((set) => ({
   dims: defaultDims,
   elements: buildDefaultElements(defaultDims),
+  transportCo2Kg: 0,
+  setTransportCo2Kg: (transportCo2Kg) => set({ transportCo2Kg }),
   modelUrl: null,
   modelKind: null,
   modelName: null,

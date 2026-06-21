@@ -9,17 +9,18 @@ import {
   YAxis,
 } from "recharts";
 
-const BASELINE = "#E05540";
-const SURROUND = "#1A9E75";
+// TODO: replace with demo building actual before/after figures
+const BASELINE_COLOR = "#E05540";
+const EARLY_CARBON_COLOR = "#1A9E75";
 
 const intensityData = [
-  { name: "Baseline", value: 185, fill: BASELINE },
-  { name: "SURROUND", value: 128, fill: SURROUND },
+  { name: "Baseline", value: 0, fill: BASELINE_COLOR },
+  { name: "Early Carbon", value: 0, fill: EARLY_CARBON_COLOR },
 ];
 
 const totalData = [
-  { name: "Baseline", value: 725, fill: BASELINE },
-  { name: "SURROUND", value: 502, fill: SURROUND },
+  { name: "Baseline", value: 0, fill: BASELINE_COLOR },
+  { name: "Early Carbon", value: 0, fill: EARLY_CARBON_COLOR },
 ];
 
 export function CarbonDeltaPanel() {
@@ -27,7 +28,7 @@ export function CarbonDeltaPanel() {
     <div className="p-6">
       <div className="flex items-baseline justify-between flex-wrap gap-2 mb-1">
         <div className="text-[13px] font-medium text-[#1a1a1a]">
-          SURROUND material substitution — carbon delta · 105 Pujades
+          Early Carbon — material substitution delta
         </div>
         <div className="text-[11px] text-[#6a6a66]">
           Upfront carbon A1–A3 · GFA basis
@@ -39,13 +40,13 @@ export function CarbonDeltaPanel() {
           title="Intensity"
           unit="kg CO₂e / m² GFA"
           data={intensityData}
-          delta="−57 kg / m²"
+          delta="—"
         />
         <ChartCard
           title="Total"
           unit="t CO₂e"
           data={totalData}
-          delta="−223 t CO₂e"
+          delta="—"
         />
       </div>
 
@@ -55,15 +56,11 @@ export function CarbonDeltaPanel() {
       >
         <div>
           <div className="text-[18px] font-semibold text-[#1A9E75]">
-            −31% · −223 t CO₂e avoided
+            Demo building figures pending
           </div>
           <div className="text-[11px] text-[#6a6a66]">
-            Equivalent to ~45 BCN–NYC flights avoided
+            Run SurroundSync on the demo building to populate before/after data
           </div>
-        </div>
-        <div className="text-[11px] text-[#6a6a66] max-w-sm">
-          Achieved by substituting baseline concrete + new brick with CLT secondary
-          structure and reclaimed brick cladding sourced within the 22@ neighbourhood.
         </div>
       </div>
     </div>
@@ -124,7 +121,7 @@ function ChartCard({
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-2 text-right text-[11px] font-medium" style={{ color: SURROUND }}>
+      <div className="mt-2 text-right text-[11px] font-medium" style={{ color: EARLY_CARBON_COLOR }}>
         Δ {delta}
       </div>
     </div>

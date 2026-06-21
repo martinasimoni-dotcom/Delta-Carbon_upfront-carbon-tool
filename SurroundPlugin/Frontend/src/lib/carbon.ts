@@ -4,8 +4,8 @@ import type { BuildingElement } from "@/state/building";
 export const elementCO2kg = (el: BuildingElement): number =>
   el.volumeM3 * getMaterial(el.materialId).co2PerM3;
 
-export const totalCO2kg = (els: BuildingElement[]): number =>
-  els.reduce((s, e) => s + elementCO2kg(e), 0);
+export const totalCO2kg = (els: BuildingElement[], transportKg = 0): number =>
+  els.reduce((s, e) => s + elementCO2kg(e), 0) + transportKg;
 
 export type Suggestion = {
   elementId: string;

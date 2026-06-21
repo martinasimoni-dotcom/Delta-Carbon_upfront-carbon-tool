@@ -111,7 +111,7 @@ namespace SurroundPlugin.UI
             Application.Instance.Invoke(() =>
             {
                 _statusLabel.TextColor = GrayText;
-                _statusLabel.Text = isLoading ? "Scanning neighbourhood database..." : string.Empty;
+                _statusLabel.Text = isLoading ? "Calculating upfront carbon..." : string.Empty;
                 SetButtonsEnabled(!isLoading);
             });
         }
@@ -140,7 +140,7 @@ namespace SurroundPlugin.UI
             var layout = new DynamicLayout { DefaultPadding = new Padding(12), DefaultSpacing = new Size(0, 8) };
 
             // Header
-            layout.AddRow(MakeLabel("SURROUND  CARBON", FgLight, 14, FontStyle.Bold));
+            layout.AddRow(MakeLabel("Early Carbon", FgLight, 14, FontStyle.Bold));
             layout.AddRow(MakeSeparator());
 
             // Location + building info

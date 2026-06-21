@@ -19,9 +19,7 @@ const PAGE_W = 210;
 const PAGE_H = 297;
 const MARGIN = 20;
 
-const BENCHMARK_KG_PER_M2 = 240; // industry avg
-const PROJECT = "Barcelona Poble Nou Tower";
-const LOCATION = "Barcelona, Poble Nou";
+const BENCHMARK_KG_PER_M2 = 280; // European benchmark — Architecture 2030, RMI 2026
 
 const setText = (doc: jsPDF, size: number, color: [number, number, number], style: "normal" | "bold" | "italic" = "normal") => {
   doc.setFontSize(size);
@@ -29,9 +27,9 @@ const setText = (doc: jsPDF, size: number, color: [number, number, number], styl
   doc.setFont("helvetica", style);
 };
 
-const drawHeader = (doc: jsPDF, pageNum: number) => {
+const drawHeader = (doc: jsPDF, pageNum: number, projectName: string) => {
   setText(doc, 8, MUTED);
-  doc.text("EMBODIED CARBON TOOL  /  Barcelona Poble Nou", MARGIN, 12);
+  doc.text(`EMBODIED CARBON TOOL  /  ${projectName}`, MARGIN, 12);
   doc.setDrawColor(...PINE);
   doc.setLineWidth(0.6);
   doc.line(MARGIN, 14, PAGE_W - MARGIN, 14);
@@ -66,7 +64,9 @@ const eyebrow = (doc: jsPDF, y: number, label: string) => {
 };
 
 export const downloadPassport = async () => {
-  const { elements, dims } = useBuilding.getState();
+  const { elements, dims, searchLocation, plotCenter } = useBuilding.getState();
+  const PROJECT = searchLocation?.name ?? "Demo Building";
+  const LOCATION = searchLocation?.name ?? "Location not set";
   const totalKg = totalCO2kg(elements);
   const totalT = totalKg / 1000;
   const floors = Math.max(1, Math.round(dims.height / 3));
@@ -143,7 +143,7 @@ export const downloadPassport = async () => {
 
   // ============ PAGE 2 — EXECUTIVE SUMMARY ============
   doc.addPage();
-  drawHeader(doc, 2);
+  drawHeader(doc, 2, PROJECT);
   let y = 28;
   sectionTitle(doc, y, "Executive Summary");
   y += 10;
@@ -165,7 +165,7 @@ export const downloadPassport = async () => {
     [
       "vs Benchmark",
       `${benchDelta >= 0 ? "+" : ""}${benchDelta.toFixed(0)}%`,
-      `Industry avg ${BENCHMARK_KG_PER_M2} kg/m²`,
+      `European avg ${BENCHMARK_KG_PER_M2} kg/m²`,
     ],
   ];
   cards.forEach(([label, num, sub], i) => {
@@ -216,7 +216,7 @@ export const downloadPassport = async () => {
 
   // ============ PAGE 3 — MATERIAL BREAKDOWN ============
   doc.addPage();
-  drawHeader(doc, 3);
+  drawHeader(doc, 3, PROJECT);
   y = 28;
   sectionTitle(doc, y, "Material Breakdown");
   y += 8;
@@ -253,7 +253,7 @@ export const downloadPassport = async () => {
 
   // ============ PAGE 4 — MATERIAL CARDS ============
   doc.addPage();
-  drawHeader(doc, 4);
+  drawHeader(doc, 4, PROJECT);
   y = 28;
   sectionTitle(doc, y, "Material Specifications");
   y += 10;
@@ -279,7 +279,7 @@ export const downloadPassport = async () => {
     if (y + cardHeight > PAGE_H - 22) {
       drawFooter(doc);
       doc.addPage();
-      drawHeader(doc, doc.getNumberOfPages());
+      drawHeader(doc, doc.getNumberOfPages(), PROJECT);
       y = 28;
       sectionTitle(doc, y, "Material Specifications (cont.)");
       y += 10;
@@ -327,7 +327,7 @@ export const downloadPassport = async () => {
 
   // ============ PAGE 5 — OPTIMIZATION ============
   doc.addPage();
-  drawHeader(doc, doc.getNumberOfPages());
+  drawHeader(doc, doc.getNumberOfPages(), PROJECT);
   y = 28;
   sectionTitle(doc, y, "Optimization Opportunities");
   y += 10;
@@ -389,7 +389,7 @@ export const downloadPassport = async () => {
 
   // ============ PAGE 6 — METHODOLOGY ============
   doc.addPage();
-  drawHeader(doc, doc.getNumberOfPages());
+  drawHeader(doc, doc.getNumberOfPages(), PROJECT);
   y = 28;
   sectionTitle(doc, y, "Methodology & References");
   y += 12;
@@ -413,7 +413,7 @@ export const downloadPassport = async () => {
   ]);
 
   sect("Benchmarks", [
-    `Industry average: ${BENCHMARK_KG_PER_M2} kg CO2/m²`,
+    `European benchmark: ${BENCHMARK_KG_PER_M2} kg CO₂e/m² (Architecture 2030, RMI 2026)`,
     `This project: ${kgPerM2.toFixed(0)} kg CO2/m² (${benchDelta >= 0 ? "+" : ""}${benchDelta.toFixed(0)}% vs. average)`,
     "Barcelona Climate Neutrality 2030: 45% reduction target",
   ]);
@@ -422,7 +422,9 @@ export const downloadPassport = async () => {
     `Generated: ${today}`,
     "Tool: Embodied Carbon Assessment Tool v1.0",
     "Data: MaterialePyramiden.dk (KADK / CINARK)",
-    "Location: 41.4036° N, 2.1900° E",
+    plotCenter
+      ? `Location: ${Math.abs(plotCenter.lat).toFixed(4)}° ${plotCenter.lat >= 0 ? "N" : "S"}, ${Math.abs(plotCenter.lon).toFixed(4)}° ${plotCenter.lon >= 0 ? "E" : "W"}`
+      : "Location: Coordinates not set",
   ]);
 
   setText(doc, 8, MUTED, "italic");

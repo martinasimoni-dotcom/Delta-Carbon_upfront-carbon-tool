@@ -4,25 +4,29 @@ using SurroundPlugin.Models;
 
 namespace SurroundPlugin.Core
 {
+    // Carbon coefficients source: BEDEC/ITeC (Institut de Tecnologia de la Construcció de Catalunya)
+    // Values: kg CO₂e/m³ at A1–A3. Retrieved via 2050-materials API, country="ES".
+    // Last aligned: June 2026
+
     /// <summary>
     /// Recalculates carbon totals locally when the user overrides a material.
-    /// Uses the EPD coefficients from PRD §9 (MaterialePyramiden source).
+    /// Coefficients from BEDEC/ITeC, country="ES".
     /// </summary>
     public class CarbonCalculator
     {
-        // EPD A1–A3 coefficients kg CO₂e/m³ — PRD §9 table
+        // EPD A1–A3 coefficients kg CO₂e/m³ — BEDEC/ITeC source
         public static readonly IReadOnlyDictionary<string, double> EpdCoefficients =
             new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase)
             {
-                { "Concrete C30/37",        282   },
-                { "Brick",                  297   },
-                { "Structural Steel",       5403  },
-                { "Aluminium",              28890 },
-                { "CLT Timber",            -664   },
-                { "Wood Fibre",            -127   },
-                { "Straw",                 -127   },
-                { "Stone Wool Insulation",   93.3 },
-                { "Glass (double glazing)",  850  },
+                { "Concrete C30/37",        312   }, // BEDEC/ITeC: +312 kg CO₂e/m³
+                { "Brick",                  432   }, // BEDEC/ITeC: +432 kg CO₂e/m³
+                { "Structural Steel",      11461  }, // BEDEC/ITeC: +11,461 kg CO₂e/m³
+                { "Aluminium",             46605  }, // BEDEC/ITeC: +46,605 kg CO₂e/m³
+                { "CLT Timber",             -400  }, // BEDEC/ITeC: −400 kg CO₂e/m³
+                { "Wood Fibre",             -127  }, // TODO: verify against BEDEC/ITeC
+                { "Straw",                  -120  }, // BEDEC/ITeC: −120 kg CO₂e/m³
+                { "Stone Wool Insulation",    93  }, // BEDEC/ITeC: +93 kg CO₂e/m³
+                { "Glass (double glazing)",  850  }, // TODO: verify against BEDEC/ITeC
             };
 
         /// <summary>

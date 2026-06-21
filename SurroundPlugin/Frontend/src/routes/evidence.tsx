@@ -8,11 +8,10 @@ export const Route = createFileRoute("/evidence")({
   component: EvidencePage,
   head: () => ({
     meta: [
-      { title: "Design Evidence — 105 Carrer de Pujades · SURROUND" },
+      { title: "Early Carbon — Design Evidence" },
       {
         name: "description",
-        content:
-          "Material zones, supplier locality and carbon delta for the SURROUND pilot at 105 Carrer de Pujades, 22@ Poblenou.",
+        content: "Early Carbon upfront carbon assessment — design evidence",
       },
     ],
   }),
@@ -27,25 +26,25 @@ function EvidencePage() {
             to="/"
             className="text-sm font-semibold tracking-[0.15em] uppercase text-foreground hover:opacity-70"
           >
-            SURROUND
+            Early Carbon
           </Link>
           <span className="text-[10px] tracking-[0.14em] uppercase text-[#5bbfaa]">
             Design Evidence
           </span>
         </div>
         <span className="text-[11px] tracking-wider uppercase border border-[#e8e8e4] px-2 py-1 text-muted-foreground">
-          105 Carrer de Pujades · 22@ Poblenou
+          Demo building — upfront carbon assessment
         </span>
       </header>
 
       <main className="max-w-[1400px] mx-auto px-6 py-10 space-y-10">
         <div>
           <h1 className="text-2xl font-semibold text-[#1a1a1a]">
-            Design Evidence — 105 Carrer de Pujades
+            Design Evidence
           </h1>
           <p className="text-sm text-[#6a6a66] mt-2 max-w-3xl">
-            Material zones, neighbourhood-scale supplier provenance and upfront carbon
-            delta for the SURROUND pilot. Scope A1–A3, GFA basis.
+            Material zones, supplier locality and upfront carbon delta for the demo building.
+            Scope A1–A3, GFA basis.
           </p>
         </div>
 

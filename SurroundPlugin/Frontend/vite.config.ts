@@ -8,14 +8,16 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import type { Plugin } from "vite";
 import type { IncomingMessage, ServerResponse } from "http";
 
-// EPD carbon coefficients (A1–A3), matching materials.ts
+// Carbon coefficients source: BEDEC/ITeC (Institut de Tecnologia de la Construcció de Catalunya)
+// Values: kg CO₂e/m³ at A1–A3. Fallback values — replaced by live EPD API at suggestion time.
+// Last aligned: June 2026
 const EPD: Record<string, { name: string; co2PerM3: number }> = {
-  foundation: { name: "Concrete C30/37",  co2PerM3: 282  },
-  structure:  { name: "Concrete C30/37",  co2PerM3: 282  },
-  envelope:   { name: "Brick, red",        co2PerM3: 297  },
-  floors:     { name: "Concrete C20/25",  co2PerM3: 215  },
-  roof:       { name: "Structural steel", co2PerM3: 5403 },
-  other:      { name: "Concrete C20/25",  co2PerM3: 215  },
+  foundation: { name: "Concrete C30/37",  co2PerM3:   312 }, // BEDEC/ITeC: +312 kg CO₂e/m³
+  structure:  { name: "Concrete C30/37",  co2PerM3:   312 }, // BEDEC/ITeC: +312 kg CO₂e/m³
+  envelope:   { name: "Brick, red",       co2PerM3:   432 }, // BEDEC/ITeC: +432 kg CO₂e/m³
+  floors:     { name: "Concrete C20/25",  co2PerM3:   258 }, // BEDEC/ITeC: +258 kg CO₂e/m³
+  roof:       { name: "Structural steel", co2PerM3: 11461 }, // BEDEC/ITeC: +11,461 kg CO₂e/m³
+  other:      { name: "Concrete C20/25",  co2PerM3:   258 }, // BEDEC/ITeC: +258 kg CO₂e/m³
 };
 
 type Cache = {
@@ -130,7 +132,41 @@ function rhinoBridge(): Plugin {
           if (req.method === "POST") {
             let body = "";
             req.on("data", (chunk: Buffer) => { body += chunk.toString(); });
-            req.on("end", () => {
+            req.on("end", async () => {
+              // Try FastAPI backend first
+              try {
+                const backendRes = await fetch("http://localhost:8000/v1/carbon/estimate", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body,
+                });
+                const data = await backendRes.json();
+                // Update local cache from FastAPI response so GET still works
+                try {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const raw = JSON.parse(body) as any;
+                  const geo = raw.geometry ?? {};
+                  const side = Math.sqrt(Math.max(geo.footprint_m2 ?? 1, 1));
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const inEls: any[] = raw.elements ?? [];
+                  const loc = raw.location as { lat?: number; lon?: number } | undefined;
+                  cache = {
+                    estimate: data,
+                    dims:     { width: side, depth: side, height: geo.height_m ?? 0 },
+                    elements: inEls.map((e) => ({ id: String(e.type ?? "other"), volumeM3: Number(e.volume_m3 ?? 0) })),
+                    location: (loc?.lat && loc?.lon) ? { lat: loc.lat, lon: loc.lon } : null,
+                    updatedAt: Date.now(),
+                  };
+                } catch { /* cache update is best-effort */ }
+                res.writeHead(200, headers);
+                res.end(JSON.stringify(data));
+                return;
+              } catch {
+                // FastAPI unavailable — fall back to local computation
+                console.warn("[rhino-bridge] FastAPI backend unavailable, using local fallback");
+              }
+
+              // Local fallback (kept in sync with BEDEC/ITeC coefficients)
               try {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const data = JSON.parse(body) as any;
@@ -160,7 +196,7 @@ function rhinoBridge(): Plugin {
                       percentage: totalKg !== 0 ? Math.abs(r.co2_kg / totalKg) * 100 : 0,
                     })),
                   },
-                  metadata: { inference_method: "local_epd", accuracy_estimate: "±18%", neighbors_used: 0 },
+                  metadata: { inference_method: "local_epd_fallback", accuracy_estimate: "±18%", source: "BEDEC/ITeC" },
                 };
 
                 const side = Math.sqrt(Math.max(footprintM2, 1));
@@ -178,6 +214,44 @@ function rhinoBridge(): Plugin {
               } catch {
                 res.writeHead(400, headers);
                 res.end(JSON.stringify({ error: "invalid_json" }));
+              }
+            });
+            return;
+          }
+
+          next();
+        },
+      );
+
+      // /v1/suggestions — proxy to FastAPI (no local fallback; LLM call required)
+      server.middlewares.use(
+        "/v1/suggestions",
+        (req: IncomingMessage, res: ServerResponse, next: () => void) => {
+          const headers = {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          };
+
+          if (req.method === "OPTIONS") { res.writeHead(204, headers); res.end(); return; }
+
+          if (req.method === "POST") {
+            let body = "";
+            req.on("data", (chunk: Buffer) => { body += chunk.toString(); });
+            req.on("end", async () => {
+              try {
+                const backendRes = await fetch("http://localhost:8000/v1/suggestions", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body,
+                });
+                const data = await backendRes.json();
+                res.writeHead(200, headers);
+                res.end(JSON.stringify(data));
+              } catch {
+                res.writeHead(503, headers);
+                res.end(JSON.stringify({ error: "backend_unavailable", suggestions: [] }));
               }
             });
             return;

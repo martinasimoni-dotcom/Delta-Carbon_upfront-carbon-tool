@@ -70,7 +70,7 @@ namespace SurroundPlugin.Commands
                 }
 
                 RhinoApp.WriteLine($"SURROUND: Location {buildingData.Location}");
-                RhinoApp.WriteLine("SURROUND: Scanning neighbourhood database...");
+                RhinoApp.WriteLine("SURROUND: Sending geometry to carbon engine...");
 
                 // ── Step 3: API call ──────────────────────────────────────────────
                 var apiClient = SurroundPlugin.Instance?.ApiClient;

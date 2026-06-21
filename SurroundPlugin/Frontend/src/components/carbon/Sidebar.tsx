@@ -7,6 +7,9 @@ import {
 } from "@/components/ui/accordion";
 import { ElementsSection } from "./sections/ElementsSection";
 import { ResultsSection } from "./sections/ResultsSection";
+import { MapInfoSection } from "./sections/MapInfoSection";
+import { OptimizeSection } from "./sections/OptimizeSection";
+import { SupplierSection } from "./sections/SupplierSection";
 
 // ── 1. Connect to Rhino ──────────────────────────────────────────────────────
 
@@ -78,40 +81,34 @@ function RhinoConnectSection() {
   );
 }
 
-// ── 4. Optimization (placeholder) ───────────────────────────────────────────
+// ── 5. Material suggestions wrapper (adds prototype subtitle) ────────────────
 
-function OptimizeSection() {
+function MaterialSuggestionsSection() {
   return (
-    <div className="rounded-sm border border-border bg-muted/20 px-4 py-6 text-center space-y-1">
-      <p className="text-xs font-medium text-foreground">AI suggestions coming soon</p>
+    <div className="space-y-3">
       <p className="text-[10px] text-muted-foreground">
-        Material substitution and structural optimisation powered by machine learning.
+        Prototype — RAG pipeline in development
       </p>
+      <OptimizeSection />
     </div>
   );
 }
 
-// ── 5. Suppliers (placeholder) ───────────────────────────────────────────────
+// ── 6. Suppliers ─────────────────────────────────────────────────────────────
 
 function SuppliersSection() {
-  return (
-    <div className="rounded-sm border border-border bg-muted/20 px-4 py-6 text-center space-y-1">
-      <p className="text-xs font-medium text-foreground">Local suppliers — Barcelona, Catalonia</p>
-      <p className="text-[10px] text-muted-foreground">
-        Verified low-carbon material suppliers within 150 km.
-      </p>
-    </div>
-  );
+  return <SupplierSection />;
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 
 const sections = [
-  { id: "connect",   n: "01", title: "Connect to Rhino",   body: <RhinoConnectSection /> },
-  { id: "elements",  n: "02", title: "Building Elements",   body: <ElementsSection /> },
-  { id: "results",   n: "03", title: "CO₂ Results",         body: <ResultsSection /> },
-  { id: "optimize",  n: "04", title: "Optimization",        body: <OptimizeSection /> },
-  { id: "suppliers", n: "05", title: "Suppliers",           body: <SuppliersSection /> },
+  { id: "site",      n: "01", title: "Site",                      body: <MapInfoSection /> },
+  { id: "connect",   n: "02", title: "Connect to Rhino",          body: <RhinoConnectSection /> },
+  { id: "elements",  n: "03", title: "Building Elements",          body: <ElementsSection /> },
+  { id: "results",   n: "04", title: "CO₂ Results",               body: <ResultsSection /> },
+  { id: "optimize",  n: "05", title: "Material Suggestions",       body: <MaterialSuggestionsSection /> },
+  { id: "suppliers", n: "06", title: "Suppliers",                  body: <SuppliersSection /> },
 ];
 
 export function Sidebar() {
@@ -119,7 +116,7 @@ export function Sidebar() {
     <aside className="w-[380px] border-l border-border bg-background overflow-y-auto">
       <Accordion
         type="multiple"
-        defaultValue={["connect", "elements", "results"]}
+        defaultValue={["site", "connect", "elements", "results"]}
         className="w-full"
       >
         {sections.map((s) => (
