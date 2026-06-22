@@ -24,6 +24,7 @@ type ElementSuggestions = {
 export function OptimizeSection() {
   const elements = useBuilding((s) => s.elements);
   const setMaterial = useBuilding((s) => s.setMaterial);
+  const updateCurrentProject = useBuilding((s) => s.updateCurrentProject);
   const [state, setState] = useState<Record<string, ElementSuggestions>>({});
 
   const fetchSuggestions = async (elementId: string) => {
@@ -84,11 +85,11 @@ export function OptimizeSection() {
   };
 
   const applyLiveSuggestion = (elementId: string, suggestion: LiveSuggestion) => {
-    // Find the closest matching material in the local library by co2PerM3
     const match = MATERIALS.reduce((best, m) =>
       Math.abs(m.co2PerM3 - suggestion.co2_per_m3) < Math.abs(best.co2PerM3 - suggestion.co2_per_m3) ? m : best
     );
     setMaterial(elementId, match.id);
+    updateCurrentProject();
   };
 
   return (

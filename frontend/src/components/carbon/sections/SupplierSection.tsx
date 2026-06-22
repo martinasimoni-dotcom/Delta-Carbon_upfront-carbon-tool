@@ -48,6 +48,8 @@ export function SupplierSection() {
   const plotCenter = useBuilding((s) => s.plotCenter);
   const elements = useBuilding((s) => s.elements);
   const setTransportCo2Kg = useBuilding((s) => s.setTransportCo2Kg);
+  const setSupplierName = useBuilding((s) => s.setSupplierName);
+  const updateCurrentProject = useBuilding((s) => s.updateCurrentProject);
 
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
 
@@ -119,6 +121,8 @@ export function SupplierSection() {
 
       setResult(res);
       setTransportCo2Kg(transportCo2Kg);
+      setSupplierName(res.name);
+      updateCurrentProject();
     } catch (e) {
       setError(`Distance calculation failed: ${e instanceof Error ? e.message : String(e)}`);
     } finally {

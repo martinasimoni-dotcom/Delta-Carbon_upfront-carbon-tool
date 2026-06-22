@@ -31,6 +31,13 @@ let cache: Cache | null = null;
 let plotCache: { lat: number; lon: number; id: string | number } | null = null;
 let objCache: string | null = null;
 
+// Holds the project name selected in the web app — polled by the Rhino plugin every 3 s
+let projectCache: { projectName: string | null; projectId: string | null; location: string | null } = {
+  projectName: null,
+  projectId: null,
+  location: null,
+};
+
 // Vite middleware plugin — intercepts plugin requests before @cloudflare/vite-plugin
 function rhinoBridge(): Plugin {
   return {
@@ -59,6 +66,43 @@ function rhinoBridge(): Plugin {
                 } else {
                   res.writeHead(400, headers); res.end(JSON.stringify({ error: "lat/lon required" }));
                 }
+              } catch { res.writeHead(400, headers); res.end(JSON.stringify({ error: "invalid_json" })); }
+            });
+            return;
+          }
+          next();
+        },
+      );
+
+      // Project selection endpoint — Rhino plugin polls this every 3 s
+      server.middlewares.use(
+        "/api/plugin/project",
+        (req: IncomingMessage, res: ServerResponse, next: () => void) => {
+          const headers = {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          };
+          if (req.method === "OPTIONS") { res.writeHead(204, headers); res.end(); return; }
+          if (req.method === "GET") {
+            res.writeHead(200, headers);
+            res.end(JSON.stringify(projectCache));
+            return;
+          }
+          // POST — web app calls this when user selects a project
+          if (req.method === "POST") {
+            let body = "";
+            req.on("data", (chunk: Buffer) => { body += chunk.toString(); });
+            req.on("end", () => {
+              try {
+                const d = JSON.parse(body) as { projectName?: string; projectId?: string; location?: string };
+                projectCache = {
+                  projectName: d.projectName ?? null,
+                  projectId:   d.projectId   ?? null,
+                  location:    d.location    ?? null,
+                };
+                res.writeHead(200, headers); res.end(JSON.stringify({ ok: true }));
               } catch { res.writeHead(400, headers); res.end(JSON.stringify({ error: "invalid_json" })); }
             });
             return;

@@ -1,239 +1,246 @@
 using System;
-using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Eto.Drawing;
 using Eto.Forms;
 using Rhino;
 using Rhino.UI;
-using SurroundPlugin.Models;
 
 namespace SurroundPlugin.UI
 {
     /// <summary>
-    /// Docked SURROUND Carbon panel (right side of Rhino window).
-    /// Implements Rhino.UI.IPanel so it participates in Rhino's panel system.
-    /// The panel GUID must remain stable across builds — it identifies the panel in user preferences.
+    /// Docked Delta Carbon panel — minimal: Choose Project + Sync.
+    /// The panel GUID must remain stable across builds.
     /// </summary>
     [System.Runtime.InteropServices.Guid("6F3A2B1C-D4E5-4F60-9A7B-8C9D0E1F2A3B")]
     public class CarbonPanel : Panel, IPanel
     {
         // ── singleton ────────────────────────────────────────────────────────────
         public static CarbonPanel Instance { get; private set; }
-
         public static Guid PanelId => typeof(CarbonPanel).GUID;
 
-        // ── UI controls ──────────────────────────────────────────────────────────
-        private readonly Label _locationLabel;
-        private readonly Label _buildingInfoLabel;
-        private readonly Label _totalCarbonLabel;
-        private readonly Label _perM2Label;
-        private readonly DynamicLayout _breakdownLayout;
-        private readonly Label _statusLabel;   // loading / error messages
-        private readonly Button _btnChangeMaterials;
-        private readonly Button _btnCompareScenarios;
-        private readonly Button _btnExportPassport;
+        // ── colours (web palette) ────────────────────────────────────────────────
+        private static readonly Color BgWhite    = Colors.White;
+        private static readonly Color TextDark    = Color.FromArgb(17, 17, 17);       // #111111
+        private static readonly Color TextGrey    = Color.FromArgb(107, 114, 128);    // #6B7280
+        private static readonly Color GreenDark   = Color.FromArgb(26, 71, 49);       // #1a4731
+        private static readonly Color BorderGrey  = Color.FromArgb(229, 231, 235);    // #E5E7EB
+        private static readonly Color GreenDot    = Color.FromArgb(34, 197, 94);      // indicator green
+        private static readonly Color GreyDot     = Color.FromArgb(156, 163, 175);    // indicator grey
 
-        // ── colours ──────────────────────────────────────────────────────────────
-        private static readonly Color GreenCarbon = Color.FromArgb(0x3C, 0xB3, 0x71);
-        private static readonly Color GrayText    = Color.FromArgb(0x88, 0x88, 0x88);
-        private static readonly Color RedError    = Color.FromArgb(0xCC, 0x33, 0x33);
-        private static readonly Color BgDark      = Color.FromArgb(0x2B, 0x2B, 0x2B);
-        private static readonly Color FgLight     = Color.FromArgb(0xEC, 0xEC, 0xEC);
+        // ── controls ─────────────────────────────────────────────────────────────
+        private readonly Label  _projectLabel;
+        private readonly Button _btnChooseProject;
+        private readonly Button _btnSync;
+        private readonly Label  _statusDot;
+        private readonly Label  _statusText;
+        private readonly Label  _lastSyncLabel;
 
-        // ── constructor ──────────────────────────────────────────────────────────
+        // ── state ─────────────────────────────────────────────────────────────────
+        private string _currentProjectName = null;
+        private UITimer _pollTimer;
+        private static readonly HttpClient _http = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
 
-        /// <summary>
-        /// Called by Rhino when the panel is opened. documentSerialNumber identifies
-        /// which document this panel instance belongs to.
-        /// </summary>
+        // ── constructor ───────────────────────────────────────────────────────────
         public CarbonPanel(uint documentSerialNumber)
         {
             Instance = this;
-            BackgroundColor = BgDark;
+            BackgroundColor = BgWhite;
 
-            // Initialise all controls upfront so UpdateEstimate never needs to create them
-            _locationLabel    = MakeLabel("—", GrayText, 11);
-            _buildingInfoLabel = MakeLabel("—", FgLight,  11);
-            _totalCarbonLabel = MakeLabel("—",  GreenCarbon, 32, FontStyle.Bold);
-            _perM2Label       = MakeLabel("—", GrayText,  13);
-            _statusLabel      = MakeLabel(string.Empty, GrayText, 11);
-            _breakdownLayout  = new DynamicLayout { DefaultSpacing = new Size(4, 4) };
+            _projectLabel     = MakeLabel("No project selected", TextGrey, 11);
+            _btnChooseProject = MakeOutlineButton("CHOOSE PROJECT");
+            _btnSync          = MakeFilledButton("SYNC  ↑", GreenDark, Colors.White);
+            _statusDot        = MakeLabel("●", GreyDot, 11);
+            _statusText       = MakeLabel("Waiting for project...", TextGrey, 11);
+            _lastSyncLabel    = MakeLabel("Last sync: —", TextGrey, 10);
 
-            _btnChangeMaterials  = MakeButton("Change Materials...");
-            _btnCompareScenarios = MakeButton("Compare Scenarios");
-            _btnExportPassport   = MakeButton("Export Passport");
+            _btnSync.Enabled = false;
 
-            _btnChangeMaterials.Click  += (s, e) => RhinoApp.RunScript("SurroundMaterials",  false);
-            _btnCompareScenarios.Click += (s, e) => RhinoApp.RunScript("SurroundCompare",    false);
-            _btnExportPassport.Click   += (s, e) => RhinoApp.RunScript("SurroundExport",     false);
+            _btnChooseProject.Click += OnChooseProject;
+            _btnSync.Click          += OnSync;
 
             Content = BuildLayout();
-            SetLoadingState(false);
-        }
-
-        // ── public API ───────────────────────────────────────────────────────────
-
-        /// <summary>Populates every panel element from a completed API response.</summary>
-        public void UpdateEstimate(CarbonEstimate estimate, BuildingData buildingData)
-        {
-            if (estimate?.BaselineCarbon == null) return;
-
-            Application.Instance.Invoke(() =>
-            {
-                try
-                {
-                    var bc = estimate.BaselineCarbon;
-                    var geo = buildingData?.Geometry;
-                    var loc = buildingData?.Location;
-
-                    _locationLabel.Text = loc != null ? loc.ToString() : "—";
-                    _buildingInfoLabel.Text = geo != null
-                        ? $"{buildingData.UseType}  ·  {geo.FootprintM2:F0} m²  ·  {geo.HeightM:F0} m\nGFA: {geo.FootprintM2 * geo.Floors:F0} m²"
-                        : "—";
-
-                    _totalCarbonLabel.Text = $"{bc.TotalTonnes:F0} t CO₂e";
-                    _perM2Label.Text       = $"{bc.PerM2:F0} kg / m²";
-
-                    RebuildBreakdown(bc.Breakdown);
-
-                    _statusLabel.Text      = string.Empty;
-                    SetButtonsEnabled(true);
-                }
-                catch (Exception ex)
-                {
-                    RhinoApp.WriteLine($"SURROUND: Panel update error: {ex.Message}");
-                }
-            });
-        }
-
-        /// <summary>Toggles spinner / disables buttons while waiting for the API.</summary>
-        public void SetLoadingState(bool isLoading)
-        {
-            Application.Instance.Invoke(() =>
-            {
-                _statusLabel.TextColor = GrayText;
-                _statusLabel.Text = isLoading ? "Calculating upfront carbon..." : string.Empty;
-                SetButtonsEnabled(!isLoading);
-            });
-        }
-
-        /// <summary>Shows a red error message in the status area.</summary>
-        public void SetErrorState(string message)
-        {
-            Application.Instance.Invoke(() =>
-            {
-                _statusLabel.TextColor = RedError;
-                _statusLabel.Text = message ?? string.Empty;
-                SetButtonsEnabled(false);
-            });
+            StartPolling();
         }
 
         // ── IPanel ───────────────────────────────────────────────────────────────
-
-        public void PanelShown(uint documentSerialNumber, ShowPanelReason reason) { }
+        public void PanelShown(uint documentSerialNumber, ShowPanelReason reason)  { }
         public void PanelHidden(uint documentSerialNumber, ShowPanelReason reason) { }
-        public void PanelClosing(uint documentSerialNumber, bool onCloseDocument) { }
+        public void PanelClosing(uint documentSerialNumber, bool onCloseDocument)  { }
 
-        // ── layout builder ───────────────────────────────────────────────────────
+        // ── event handlers ────────────────────────────────────────────────────────
+        private void OnChooseProject(object sender, EventArgs e)
+        {
+            // Open the web dashboard in the default browser
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("http://localhost:5173") { UseShellExecute = true }); }
+            catch (Exception ex) { RhinoApp.WriteLine($"Delta Carbon: could not open browser — {ex.Message}"); }
+        }
 
+        private async void OnSync(object sender, EventArgs e)
+        {
+            _btnSync.Text    = "SYNCING...";
+            _btnSync.Enabled = false;
+            _btnChooseProject.Enabled = false;
+
+            await Task.Run(() => RhinoApp.RunScript("SurroundSync", false));
+
+            Application.Instance.Invoke(() =>
+            {
+                _btnSync.Text    = "SYNC  ↑";
+                _btnSync.Enabled = _currentProjectName != null;
+                _btnChooseProject.Enabled = true;
+                _lastSyncLabel.Text = $"Last sync: {DateTime.Now:HH:mm:ss}";
+                SetStatus(true, $"Synced — {_currentProjectName}");
+            });
+        }
+
+        // ── polling ───────────────────────────────────────────────────────────────
+        private void StartPolling()
+        {
+            _pollTimer = new UITimer { Interval = 3.0 };
+            _pollTimer.Elapsed += async (s, e) => await PollProject();
+            _pollTimer.Start();
+        }
+
+        private async Task PollProject()
+        {
+            try
+            {
+                var json = await _http.GetStringAsync("http://localhost:5173/api/plugin/project");
+                // Simple JSON parse — avoid adding a dependency on System.Text.Json or Newtonsoft
+                var name = ExtractJsonString(json, "projectName");
+                if (name != null && name != _currentProjectName)
+                {
+                    _currentProjectName = name;
+                    Application.Instance.Invoke(() =>
+                    {
+                        _projectLabel.Text   = name;
+                        _projectLabel.TextColor = TextDark;
+                        _btnSync.Enabled     = true;
+                        SetStatus(true, $"Project: {name}");
+                    });
+                }
+                else if (name == null && _currentProjectName != null)
+                {
+                    _currentProjectName = null;
+                    Application.Instance.Invoke(() =>
+                    {
+                        _projectLabel.Text   = "No project selected";
+                        _projectLabel.TextColor = TextGrey;
+                        _btnSync.Enabled     = false;
+                        SetStatus(false, "Waiting for project...");
+                    });
+                }
+            }
+            catch
+            {
+                // Frontend not running — silent, keep previous state
+            }
+        }
+
+        // ── helpers ───────────────────────────────────────────────────────────────
+        private void SetStatus(bool connected, string text)
+        {
+            _statusDot.TextColor = connected ? GreenDot : GreyDot;
+            _statusText.Text     = text;
+        }
+
+        /// <summary>Minimal JSON string extractor — avoids adding a JSON library.</summary>
+        private static string ExtractJsonString(string json, string key)
+        {
+            var search = $"\"{key}\"";
+            var idx = json.IndexOf(search, StringComparison.Ordinal);
+            if (idx < 0) return null;
+            idx += search.Length;
+            // skip whitespace and colon
+            while (idx < json.Length && (json[idx] == ' ' || json[idx] == ':')) idx++;
+            if (idx >= json.Length) return null;
+            if (json[idx] == 'n') return null; // null
+            if (json[idx] != '"') return null;
+            idx++; // skip opening quote
+            var end = json.IndexOf('"', idx);
+            if (end < 0) return null;
+            return json.Substring(idx, end - idx);
+        }
+
+        // ── layout builder ────────────────────────────────────────────────────────
         private Control BuildLayout()
         {
-            var layout = new DynamicLayout { DefaultPadding = new Padding(12), DefaultSpacing = new Size(0, 8) };
+            var layout = new DynamicLayout
+            {
+                DefaultPadding = new Padding(16),
+                DefaultSpacing = new Size(0, 10),
+                BackgroundColor = BgWhite,
+            };
 
-            // Header
-            layout.AddRow(MakeLabel("Delta Carbon", FgLight, 14, FontStyle.Bold));
+            // Header — "Delta Carbon"
+            layout.AddRow(MakeLabel("Delta Carbon", TextDark, 14, FontStyle.Bold));
             layout.AddRow(MakeSeparator());
 
-            // Location + building info
-            layout.AddRow(MakeLabel("LOCATION", GrayText, 9, FontStyle.Bold));
-            layout.AddRow(_locationLabel);
-            layout.AddRow(_buildingInfoLabel);
+            // Project display
+            layout.AddRow(MakeLabel("PROJECT", TextGrey, 9, FontStyle.Bold));
+            layout.AddRow(_projectLabel);
+
+            // Choose Project button
+            layout.AddRow(_btnChooseProject);
             layout.AddRow(MakeSeparator());
 
-            // Totals
-            layout.AddRow(_totalCarbonLabel);
-            layout.AddRow(_perM2Label);
-            layout.AddRow(MakeSeparator());
+            // Sync button
+            layout.AddRow(_btnSync);
 
-            // Breakdown
-            layout.AddRow(MakeLabel("BREAKDOWN", GrayText, 9, FontStyle.Bold));
-            layout.AddRow(_breakdownLayout);
-            layout.AddRow(MakeSeparator());
+            // Status row
+            var statusRow = new DynamicLayout { DefaultSpacing = new Size(4, 0) };
+            statusRow.BeginHorizontal();
+            statusRow.Add(_statusDot);
+            statusRow.Add(_statusText, xscale: true);
+            statusRow.EndHorizontal();
+            layout.AddRow(statusRow);
 
-            // Status / loading / error line
-            layout.AddRow(_statusLabel);
+            layout.AddRow(_lastSyncLabel);
 
-            // Buttons
-            layout.AddRow(_btnChangeMaterials);
-            layout.AddRow(_btnCompareScenarios);
-            layout.AddRow(_btnExportPassport);
-            layout.AddRow(MakeSeparator());
-
-            // Footer disclaimer
-            layout.AddRow(MakeLabel("⚠ ±18% accuracy estimate", GrayText, 10));
-
-            // Spacer pushes content to top
+            // Spacer
             layout.Add(null);
 
             var scrollable = new Scrollable { Content = layout, Border = BorderType.None };
-            scrollable.BackgroundColor = BgDark;
+            scrollable.BackgroundColor = BgWhite;
             return scrollable;
         }
 
-        private void RebuildBreakdown(List<CarbonBreakdownItem> items)
+        private static Label MakeLabel(string text, Color color, int size, FontStyle style = FontStyle.None)
         {
-            _breakdownLayout.Clear();
-
-            if (items == null || items.Count == 0)
-            {
-                _breakdownLayout.AddRow(MakeLabel("No data", GrayText, 11));
-                return;
-            }
-
-            foreach (var item in items)
-            {
-                // Row label: "Structure — Concrete C30/37 — 35%"
-                string labelText = $"{item.Element}  —  {item.MaterialInferred}  —  {item.Percentage:F0}%";
-                _breakdownLayout.AddRow(MakeLabel(labelText, FgLight, 11));
-
-                // Progress bar (0–100)
-                var bar = new ProgressBar
-                {
-                    MinValue = 0,
-                    MaxValue = 100,
-                    Value = (int)Math.Min(100, Math.Max(0, item.Percentage))
-                };
-                _breakdownLayout.AddRow(bar);
-            }
-        }
-
-        // ── helpers ──────────────────────────────────────────────────────────────
-
-        private static Label MakeLabel(string text, Color color, int size,
-                                       FontStyle style = FontStyle.None)
-        {
-            // Font(SystemFont, float?) overload doesn't accept FontStyle.
-            // Map Bold via the Bold system font; italic unsupported in this helper.
             var systemFont = (style & FontStyle.Bold) != 0 ? SystemFont.Bold : SystemFont.Default;
             return new Label
             {
                 Text      = text,
                 TextColor = color,
                 Font      = new Font(systemFont, size),
-                Wrap      = WrapMode.Word
+                Wrap      = WrapMode.Word,
             };
         }
 
         private static Control MakeSeparator()
-            => new Panel { Height = 1, BackgroundColor = Color.FromArgb(0x44, 0x44, 0x44) };
+            => new Panel { Height = 1, BackgroundColor = BorderGrey };
 
-        private static Button MakeButton(string text)
-            => new Button { Text = text };
-
-        private void SetButtonsEnabled(bool enabled)
+        private static Button MakeOutlineButton(string text)
         {
-            _btnChangeMaterials.Enabled  = enabled;
-            _btnCompareScenarios.Enabled = enabled;
-            _btnExportPassport.Enabled   = enabled;
+            var btn = new Button
+            {
+                Text            = text,
+                BackgroundColor = Colors.White,
+                TextColor       = Color.FromArgb(17, 17, 17),
+            };
+            return btn;
+        }
+
+        private static Button MakeFilledButton(string text, Color bg, Color fg)
+        {
+            var btn = new Button
+            {
+                Text            = text,
+                BackgroundColor = bg,
+                TextColor       = fg,
+            };
+            return btn;
         }
     }
 }

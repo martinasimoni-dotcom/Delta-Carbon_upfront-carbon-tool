@@ -44,6 +44,7 @@ export function MaterialLibrary({
 }) {
   const elements = useBuilding((s) => s.elements);
   const setMaterial = useBuilding((s) => s.setMaterial);
+  const updateCurrentProject = useBuilding((s) => s.updateCurrentProject);
   const element = elements.find((e) => e.id === elementId) ?? null;
 
   const [tab, setTab] = useState<string>("all");
@@ -153,7 +154,7 @@ export function MaterialLibrary({
                   return (
                     <button
                       key={m.id}
-                      onClick={() => element && setMaterial(element.id, m.id)}
+                      onClick={() => { if (element) { setMaterial(element.id, m.id); updateCurrentProject(); } }}
                       className={cn(
                         "group text-left bg-[oklch(0.985_0_0)] rounded-sm overflow-hidden transition-all duration-200",
                         "border hover:shadow-md hover:-translate-y-0.5",

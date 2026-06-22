@@ -20,6 +20,10 @@ export function MapInfoSection() {
   const selectedParcel = useBuilding((s) => s.selectedParcel);
   const plotCenter = useBuilding((s) => s.plotCenter);
   const [sent, setSent] = useState(false);
+  const currentProjectId = useBuilding((s) => s.currentProjectId);
+  const projects = useBuilding((s) => s.projects);
+  const setCreateProjectModalOpen = useBuilding((s) => s.setCreateProjectModalOpen);
+  const currentProject = currentProjectId ? projects.find((p) => p.id === currentProjectId) : null;
 
   useEffect(() => { setSent(false); }, [selectedParcel]);
 
@@ -56,6 +60,25 @@ export function MapInfoSection() {
 
   return (
     <div className="space-y-3 text-xs">
+      {currentProject && (
+        <div className="border border-border rounded-sm p-2.5 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Project</span>
+            <button
+              onClick={() => setCreateProjectModalOpen(true, currentProject.id)}
+              className="text-[9px] uppercase tracking-wider border border-border rounded-sm px-2 py-0.5 hover:border-primary transition-colors"
+            >
+              Edit
+            </button>
+          </div>
+          <div className="text-xs font-medium text-foreground">{currentProject.name}</div>
+          <div className="text-[10px] text-muted-foreground">{currentProject.buildingUse} · {currentProject.location}</div>
+          {currentProject.gfa > 0 && (
+            <div className="text-[10px] text-muted-foreground">{currentProject.gfa} m² GFA · {currentProject.floors} floors</div>
+          )}
+        </div>
+      )}
+
       <div className="space-y-1.5 relative">
         <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
           Search location

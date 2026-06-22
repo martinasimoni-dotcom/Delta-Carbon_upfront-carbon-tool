@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useBuilding } from "@/state/building";
+import type { ProjectOption } from "@/state/building";
 import { CATEGORY_LABELS, getMaterial } from "./materials";
 import { elementCO2kg, suggestSwaps, totalCO2kg } from "./carbon";
 import { captureViewport } from "@/components/carbon/Viewport";
@@ -63,9 +64,12 @@ const eyebrow = (doc: jsPDF, y: number, label: string) => {
   doc.text(label.toUpperCase(), MARGIN, y);
 };
 
-export const downloadPassport = async () => {
-  const { elements, dims, searchLocation, plotCenter, transportCo2Kg } = useBuilding.getState();
-  const PROJECT = searchLocation?.name ?? "Demo Building";
+export const downloadPassport = async (option?: ProjectOption) => {
+  const state = useBuilding.getState();
+  const elements = option?.elements ?? state.elements;
+  const transportCo2Kg = option?.transportCo2Kg ?? state.transportCo2Kg;
+  const { dims, searchLocation, plotCenter } = state;
+  const PROJECT = option ? option.name : (searchLocation?.name ?? "Demo Building");
   const LOCATION = searchLocation?.name ?? "Location not set";
   const a1a3Kg = totalCO2kg(elements);
   const a4Kg = transportCo2Kg ?? 0;
@@ -463,5 +467,7 @@ export const downloadPassport = async () => {
 
   drawFooter(doc);
 
-  doc.save(`material-passport-${new Date().toISOString().slice(0, 10)}.pdf`);
+  const datePart = new Date().toISOString().slice(0, 10);
+  const namePart = option ? `-${option.name.toLowerCase().replace(/\s+/g, "-")}` : "";
+  doc.save(`delta-carbon${namePart}-${datePart}.pdf`);
 };

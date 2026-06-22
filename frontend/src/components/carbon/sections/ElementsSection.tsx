@@ -9,6 +9,7 @@ import { ChevronRight } from "lucide-react";
 export function ElementsSection() {
   const elements = useBuilding((s) => s.elements);
   const setVolume = useBuilding((s) => s.setVolume);
+  const updateCurrentProject = useBuilding((s) => s.updateCurrentProject);
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
@@ -53,7 +54,7 @@ export function ElementsSection() {
                   <Input
                     type="number"
                     value={Math.round(e.volumeM3)}
-                    onChange={(ev) => setVolume(e.id, Number(ev.target.value) || 0)}
+                    onChange={(ev) => { setVolume(e.id, Number(ev.target.value) || 0); updateCurrentProject(); }}
                     className="h-6 w-20 text-right text-[11px] rounded-sm font-mono"
                   />
                   <span className="text-[10px] text-muted-foreground">m³</span>

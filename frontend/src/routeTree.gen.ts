@@ -9,11 +9,23 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EvidenceRouteImport } from './routes/evidence'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicParcelsRouteImport } from './routes/api/public/parcels'
 import { Route as ApiPluginEstimateRouteImport } from './routes/api/plugin/estimate'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EvidenceRoute = EvidenceRouteImport.update({
   id: '/evidence',
   path: '/evidence',
@@ -37,12 +49,16 @@ const ApiPluginEstimateRoute = ApiPluginEstimateRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/dashboard': typeof DashboardRoute
   '/evidence': typeof EvidenceRoute
   '/api/plugin/estimate': typeof ApiPluginEstimateRoute
   '/api/public/parcels': typeof ApiPublicParcelsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/dashboard': typeof DashboardRoute
   '/evidence': typeof EvidenceRoute
   '/api/plugin/estimate': typeof ApiPluginEstimateRoute
   '/api/public/parcels': typeof ApiPublicParcelsRoute
@@ -50,18 +66,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/dashboard': typeof DashboardRoute
   '/evidence': typeof EvidenceRoute
   '/api/plugin/estimate': typeof ApiPluginEstimateRoute
   '/api/public/parcels': typeof ApiPublicParcelsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/evidence' | '/api/plugin/estimate' | '/api/public/parcels'
+  fullPaths: '/' | '/login' | '/dashboard' | '/evidence' | '/api/plugin/estimate' | '/api/public/parcels'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/evidence' | '/api/plugin/estimate' | '/api/public/parcels'
+  to: '/' | '/login' | '/dashboard' | '/evidence' | '/api/plugin/estimate' | '/api/public/parcels'
   id:
     | '__root__'
     | '/'
+    | '/login'
+    | '/dashboard'
     | '/evidence'
     | '/api/plugin/estimate'
     | '/api/public/parcels'
@@ -69,6 +89,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  DashboardRoute: typeof DashboardRoute
   EvidenceRoute: typeof EvidenceRoute
   ApiPluginEstimateRoute: typeof ApiPluginEstimateRoute
   ApiPublicParcelsRoute: typeof ApiPublicParcelsRoute
@@ -76,6 +98,20 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/evidence': {
       id: '/evidence'
       path: '/evidence'
@@ -109,6 +145,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  DashboardRoute: DashboardRoute,
   EvidenceRoute: EvidenceRoute,
   ApiPluginEstimateRoute: ApiPluginEstimateRoute,
   ApiPublicParcelsRoute: ApiPublicParcelsRoute,

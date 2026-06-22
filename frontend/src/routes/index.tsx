@@ -1,12 +1,18 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { Header } from "@/components/carbon/Header";
 import { Footer } from "@/components/carbon/Footer";
 import { Sidebar } from "@/components/carbon/Sidebar";
 import { BuildingViewer } from "@/components/carbon/BuildingViewer";
+import { CreateProjectModal } from "@/components/carbon/CreateProjectModal";
 import { useBuilding } from "@/state/building";
 
 export const Route = createFileRoute("/")({
+  beforeLoad: () => {
+    const { isLoggedIn, currentProjectId } = useBuilding.getState();
+    if (!isLoggedIn) throw redirect({ to: "/login" });
+    if (!currentProjectId) throw redirect({ to: "/dashboard" });
+  },
   component: Index,
   head: () => ({
     meta: [
@@ -74,6 +80,7 @@ function Index() {
         <Sidebar />
       </div>
       <Footer />
+      <CreateProjectModal />
     </div>
   );
 }

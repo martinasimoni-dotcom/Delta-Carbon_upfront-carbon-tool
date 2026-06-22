@@ -10,6 +10,7 @@ import { ResultsSection } from "./sections/ResultsSection";
 import { MapInfoSection } from "./sections/MapInfoSection";
 import { OptimizeSection } from "./sections/OptimizeSection";
 import { SupplierSection } from "./sections/SupplierSection";
+import { OptionsSection } from "./sections/OptionsSection";
 
 // ── 1. Connect to Rhino ──────────────────────────────────────────────────────
 
@@ -108,7 +109,8 @@ const sections = [
   { id: "elements",  n: "03", title: "Building Elements",          body: <ElementsSection /> },
   { id: "results",   n: "04", title: "CO₂ Results",               body: <ResultsSection /> },
   { id: "optimize",  n: "05", title: "Material Suggestions",       body: <MaterialSuggestionsSection /> },
-  { id: "suppliers", n: "06", title: "Suppliers",                  body: <SuppliersSection /> },
+  { id: "suppliers", n: "07", title: "Suppliers",                  body: <SuppliersSection /> },
+  { id: "options",   n: "08", title: "Options",                    body: <OptionsSection /> },
 ];
 
 export function Sidebar() {
