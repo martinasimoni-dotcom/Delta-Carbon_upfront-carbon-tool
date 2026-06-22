@@ -41,7 +41,7 @@ namespace SurroundPlugin
                 Panels.RegisterPanel(
                     this,
                     typeof(UI.CarbonPanel),
-                    "Early Carbon",
+                    "Delta Carbon",
                     MakePanelIcon());
 
                 RhinoApp.WriteLine("SURROUND: Plugin loaded. Run \"SurroundAnalyze\" to begin.");

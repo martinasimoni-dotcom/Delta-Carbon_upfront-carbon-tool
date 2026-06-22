@@ -1,5 +1,5 @@
 """
-Early Carbon — FastAPI Backend
+Delta Carbon — FastAPI Backend
 Serves: /health, /v1/carbon/estimate, /v1/suggestions
 Runs on: localhost:8000
 """
@@ -25,7 +25,7 @@ sys.path.insert(0, str(_ROOT / "pipeline" / "geometry"))
 
 # ── App ───────────────────────────────────────────────────────────────────────
 
-app = FastAPI(title="Early Carbon Backend")
+app = FastAPI(title="Delta Carbon Backend")
 
 app.add_middleware(
     CORSMiddleware,
@@ -129,7 +129,7 @@ def _run_rashi_fallback(obj_text: str, footprint_m2: float) -> dict[str, float]:
             elif stype == "roof":
                 roof_vol += vol
 
-        # Map Rashi surface types to Early Carbon element types
+        # Map Rashi surface types to Delta Carbon element types
         return {
             "foundation": footprint_m2 * 0.5,   # 0.5m assumed foundation depth
             "structure":  wall_vol * 0.5,         # 50% of wall volume = structure
@@ -145,7 +145,7 @@ def _run_rashi_fallback(obj_text: str, footprint_m2: float) -> dict[str, float]:
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "Early Carbon backend"}
+    return {"status": "ok", "service": "Delta Carbon backend"}
 
 # ── /v1/carbon/estimate ───────────────────────────────────────────────────────
 

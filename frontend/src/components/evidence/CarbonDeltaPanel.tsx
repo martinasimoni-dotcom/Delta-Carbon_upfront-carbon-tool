@@ -11,16 +11,16 @@ import {
 
 // TODO: replace with demo building actual before/after figures
 const BASELINE_COLOR = "#E05540";
-const EARLY_CARBON_COLOR = "#1A9E75";
+const DELTA_CARBON_COLOR = "#1A9E75";
 
 const intensityData = [
   { name: "Baseline", value: 0, fill: BASELINE_COLOR },
-  { name: "Early Carbon", value: 0, fill: EARLY_CARBON_COLOR },
+  { name: "Delta Carbon", value: 0, fill: DELTA_CARBON_COLOR },
 ];
 
 const totalData = [
   { name: "Baseline", value: 0, fill: BASELINE_COLOR },
-  { name: "Early Carbon", value: 0, fill: EARLY_CARBON_COLOR },
+  { name: "Delta Carbon", value: 0, fill: DELTA_CARBON_COLOR },
 ];
 
 export function CarbonDeltaPanel() {
@@ -28,7 +28,7 @@ export function CarbonDeltaPanel() {
     <div className="p-6">
       <div className="flex items-baseline justify-between flex-wrap gap-2 mb-1">
         <div className="text-[13px] font-medium text-[#1a1a1a]">
-          Early Carbon — material substitution delta
+          Delta Carbon — material substitution delta
         </div>
         <div className="text-[11px] text-[#6a6a66]">
           Upfront carbon A1–A3 · GFA basis
@@ -121,7 +121,7 @@ function ChartCard({
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-2 text-right text-[11px] font-medium" style={{ color: EARLY_CARBON_COLOR }}>
+      <div className="mt-2 text-right text-[11px] font-medium" style={{ color: DELTA_CARBON_COLOR }}>
         Δ {delta}
       </div>
     </div>

@@ -8,10 +8,10 @@ export const Route = createFileRoute("/evidence")({
   component: EvidencePage,
   head: () => ({
     meta: [
-      { title: "Early Carbon — Design Evidence" },
+      { title: "Delta Carbon — Design Evidence" },
       {
         name: "description",
-        content: "Early Carbon upfront carbon assessment — design evidence",
+        content: "Delta Carbon upfront carbon assessment — design evidence",
       },
     ],
   }),
@@ -26,7 +26,7 @@ function EvidencePage() {
             to="/"
             className="text-sm font-semibold tracking-[0.15em] uppercase text-foreground hover:opacity-70"
           >
-            Early Carbon
+            Delta Carbon
           </Link>
           <span className="text-[10px] tracking-[0.14em] uppercase text-[#5bbfaa]">
             Design Evidence

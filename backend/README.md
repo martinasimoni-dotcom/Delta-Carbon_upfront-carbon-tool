@@ -1,4 +1,4 @@
-# Early Carbon — Backend
+# Delta Carbon — Backend
 
 FastAPI backend. Runs on localhost:8000.
 
