@@ -20,8 +20,8 @@ load_dotenv()
 # ── Path setup ────────────────────────────────────────────────────────────────
 
 _ROOT = Path(__file__).parent.parent
-sys.path.insert(0, str(_ROOT / "SURROUND_UPFRONT-CARBON-bhavana"))
-sys.path.insert(0, str(_ROOT / "SURROUND_UPFRONT-CARBON-rashi" / "area-volume-calculator"))
+sys.path.insert(0, str(_ROOT / "pipeline" / "epd"))
+sys.path.insert(0, str(_ROOT / "pipeline" / "geometry"))
 
 # ── App ───────────────────────────────────────────────────────────────────────
 
@@ -230,7 +230,7 @@ def suggestions(req: SuggestionRequest):
 
     records_for_llm: list[dict] = []
     try:
-        from pipeline.epd_api import search_epds, extract_gwp_from_api_record
+        from epd_api import search_epds, extract_gwp_from_api_record
 
         seen: set[str] = set()
         all_records: list[dict] = []
