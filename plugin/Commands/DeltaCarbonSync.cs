@@ -48,7 +48,24 @@ namespace DeltaCarbon.Commands
             }
             else if (buildingData.Location != null)
             {
-                RhinoApp.WriteLine($"DELTA CARBON: No plot selected in browser — using Rhino EarthAnchorPoint {buildingData.Location}");
+                // Rhino EarthAnchorPoint can return extreme values (e.g. -1.234e+308) when not set.
+                // Validate before using — invalid coords would crash the web map.
+                double lat = buildingData.Location.Lat;
+                double lon = buildingData.Location.Lon;
+                bool validCoords =
+                    !double.IsInfinity(lat) && !double.IsNaN(lat) &&
+                    !double.IsInfinity(lon) && !double.IsNaN(lon) &&
+                    Math.Abs(lat) <= 90 && Math.Abs(lon) <= 180;
+
+                if (validCoords)
+                {
+                    RhinoApp.WriteLine($"DELTA CARBON: No plot selected in browser — using Rhino EarthAnchorPoint {buildingData.Location}");
+                }
+                else
+                {
+                    buildingData.Location = new Location { Lat = 41.3997, Lon = 2.1888 };
+                    RhinoApp.WriteLine("DELTA CARBON: EarthAnchorPoint coords invalid — defaulting to Barcelona.");
+                }
             }
             else
             {

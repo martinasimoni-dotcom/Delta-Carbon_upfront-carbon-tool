@@ -1,10 +1,13 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Header } from "@/components/carbon/Header";
 import { Footer } from "@/components/carbon/Footer";
 import { Sidebar } from "@/components/carbon/Sidebar";
 import { BuildingViewer } from "@/components/carbon/BuildingViewer";
 import { CreateProjectModal } from "@/components/carbon/CreateProjectModal";
+import { ImportOBJButton } from "@/components/carbon/ImportOBJButton";
+import { SuppliersView } from "@/components/carbon/views/SuppliersView";
+import { CompareView } from "@/components/carbon/views/CompareView";
 import { useBuilding } from "@/state/building";
 
 export const Route = createFileRoute("/")({
@@ -67,19 +70,68 @@ function usePlotBroadcast() {
   }, [selectedParcel, plotCenter]);
 }
 
+const TABS = [
+  { id: "model", label: "3D Model" },
+  { id: "suppliers", label: "Suppliers" },
+  { id: "compare", label: "Compare" },
+] as const;
+
+type Tab = (typeof TABS)[number]["id"];
+
 function Index() {
   useRhinoSync();
   usePlotBroadcast();
+  const [activeTab, setActiveTab] = useState<Tab>("model");
+
   return (
     <div className="h-screen w-screen flex flex-col bg-background text-foreground">
       <Header />
-      <div className="flex flex-1 min-h-0">
-        <main className="flex-1 min-w-0 relative">
-          <BuildingViewer />
-        </main>
-        <Sidebar />
+
+      {/* Top navigation */}
+      <div className="shrink-0 bg-white border-b border-[#E5E7EB] flex items-center px-6 gap-1">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2.5 text-[11px] font-medium uppercase tracking-wider transition-colors border-b-2 -mb-px ${
+              activeTab === tab.id
+                ? "border-[#1a4731] text-[#1a4731] font-semibold"
+                : "border-transparent text-[#6B7280] hover:text-[#111111]"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
-      <Footer />
+
+      {/* Content */}
+      {activeTab === "model" && (
+        <>
+          <div className="flex flex-1 min-h-0">
+            <main className="flex-1 min-w-0 relative">
+              <div className="absolute top-2 left-2 z-10">
+                <ImportOBJButton />
+              </div>
+              <BuildingViewer />
+            </main>
+            <Sidebar />
+          </div>
+          <Footer />
+        </>
+      )}
+
+      {activeTab === "suppliers" && (
+        <div className="flex-1 min-h-0">
+          <SuppliersView />
+        </div>
+      )}
+
+      {activeTab === "compare" && (
+        <div className="flex-1 min-h-0 bg-[#FAFAFA]">
+          <CompareView />
+        </div>
+      )}
+
       <CreateProjectModal />
     </div>
   );
