@@ -237,11 +237,16 @@ export function CreateProjectModal() {
             Gross floor area (m²)
           </label>
           <Input
-            type="number"
-            value={gfa}
-            onChange={(e) => setGfa(Number(e.target.value) || 0)}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={gfa === 0 ? '' : String(gfa)}
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^0-9]/g, '');
+              setGfa(val === '' ? 0 : parseInt(val, 10));
+            }}
+            placeholder="e.g. 2000"
             className="h-8 text-xs"
-            min={0}
           />
         </div>
 
@@ -251,11 +256,16 @@ export function CreateProjectModal() {
             Number of floors
           </label>
           <Input
-            type="number"
-            value={floors}
-            onChange={(e) => setFloors(Number(e.target.value) || 0)}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={floors === 0 ? '' : String(floors)}
+            onChange={(e) => {
+              const val = e.target.value.replace(/[^0-9]/g, '');
+              setFloors(val === '' ? 0 : parseInt(val, 10));
+            }}
+            placeholder="e.g. 4"
             className="h-8 text-xs"
-            min={0}
           />
         </div>
 
