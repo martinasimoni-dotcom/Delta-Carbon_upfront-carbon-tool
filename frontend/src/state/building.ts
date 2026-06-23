@@ -127,6 +127,10 @@ type State = {
   login: () => void;
   logout: () => void;
 
+  // ── viewer highlight ──────────────────────────────────────────────────────────
+  selectedElement: string | null;
+  setSelectedElement: (element: string | null) => void;
+
   // ── legacy compat ─────────────────────────────────────────────────────────────
   currentProjectName: string | null;
   setCurrentProjectName: (name: string | null) => void;
@@ -366,6 +370,10 @@ export const useBuilding = create<State>()(
       user: null as { name: string; email: string } | null,
       login: () => set({ isLoggedIn: true, user: { name: "Demo User", email: "demo@deltacarbon.app" } }),
       logout: () => set({ isLoggedIn: false, user: null, currentProjectId: null }),
+
+      // ── viewer highlight ────────────────────────────────────────────────────────
+      selectedElement: null,
+      setSelectedElement: (selectedElement) => set({ selectedElement }),
 
       // ── legacy compat ──────────────────────────────────────────────────────────
       currentProjectName: null,

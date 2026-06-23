@@ -81,6 +81,10 @@ namespace DeltaCarbon.Commands
             await ExportAndUploadObjAsync(doc).ConfigureAwait(false);
 
             // ── Step 3: send carbon estimate to web interface ─────────────────────
+            // Strip location before sending — the web app owns geographic location (Google Maps).
+            // Rhino EarthAnchorPoint must never overwrite the user's project location.
+            buildingData.Location = null;
+
             var apiClient = DeltaCarbonPlugin.Instance?.ApiClient;
             if (apiClient == null)
             {

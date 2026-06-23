@@ -10,6 +10,8 @@ export function ElementsSection() {
   const elements = useBuilding((s) => s.elements);
   const setVolume = useBuilding((s) => s.setVolume);
   const updateCurrentProject = useBuilding((s) => s.updateCurrentProject);
+  const selectedElement = useBuilding((s) => s.selectedElement);
+  const setSelectedElement = useBuilding((s) => s.setSelectedElement);
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
@@ -18,13 +20,21 @@ export function ElementsSection() {
         {elements.map((e) => {
           const m = getMaterial(e.materialId);
           const tons = (m.co2PerM3 * e.volumeM3) / 1000;
+          const isHighlighted = selectedElement === e.kind;
           return (
             <div
               key={e.id}
-              className="group border border-border rounded-sm overflow-hidden hover:border-foreground/30 transition-colors"
+              className="group rounded-sm overflow-hidden transition-colors"
+              style={{
+                border: isHighlighted ? "2px solid #1a4731" : "1px solid hsl(var(--border))",
+                backgroundColor: isHighlighted ? "#F0F7E8" : undefined,
+              }}
             >
               <button
-                onClick={() => setOpenId(e.id)}
+                onClick={() => {
+                  setSelectedElement(isHighlighted ? null : e.kind);
+                  setOpenId(e.id);
+                }}
                 className="w-full flex items-center gap-3 px-2.5 py-2 text-left hover:bg-muted/40 transition-colors"
               >
                 <div

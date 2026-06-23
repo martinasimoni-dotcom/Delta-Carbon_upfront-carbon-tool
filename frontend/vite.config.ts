@@ -193,12 +193,11 @@ function rhinoBridge(): Plugin {
                   const side = Math.sqrt(Math.max(geo.footprint_m2 ?? 1, 1));
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   const inEls: any[] = raw.elements ?? [];
-                  const loc = raw.location as { lat?: number; lon?: number } | undefined;
                   cache = {
                     estimate: data,
                     dims:     { width: side, depth: side, height: geo.height_m ?? 0 },
                     elements: inEls.map((e) => ({ id: String(e.type ?? "other"), volumeM3: Number(e.volume_m3 ?? 0) })),
-                    location: (loc?.lat && loc?.lon) ? { lat: loc.lat, lon: loc.lon } : null,
+                    location: null, // never overwrite user's project location from Rhino payload
                     updatedAt: Date.now(),
                   };
                 } catch { /* cache update is best-effort */ }
@@ -244,12 +243,11 @@ function rhinoBridge(): Plugin {
                 };
 
                 const side = Math.sqrt(Math.max(footprintM2, 1));
-                const loc = data.location as { lat?: number; lon?: number } | undefined;
                 cache = {
                   estimate,
                   dims:     { width: side, depth: side, height: heightM },
                   elements: rows.map((r) => ({ id: r._type, volumeM3: r.volume_m3 })),
-                  location: (loc?.lat && loc?.lon) ? { lat: loc.lat, lon: loc.lon } : null,
+                  location: null, // never overwrite user's project location from Rhino payload
                   updatedAt: Date.now(),
                 };
 

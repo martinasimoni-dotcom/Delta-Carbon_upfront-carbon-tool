@@ -9,14 +9,19 @@ export function BuildingViewer() {
   const dims = useBuilding((s) => s.dims);
   const dimsRef = useRef(dims);
   dimsRef.current = dims;
+  const selectedElement = useBuilding((s) => s.selectedElement);
+  const setSelectedElement = useBuilding((s) => s.setSelectedElement);
 
   // true while no real OBJ has been loaded into the scene yet
   const [waiting, setWaiting] = useState(true);
   // flipping this boolean restarts polling (used by the refresh button)
   const [pollKey, setPollKey] = useState(0);
 
-  // Refs shared between the Three.js effect and the polling effect
+  // Refs shared between the Three.js effect and the highlight/polling effects
   const loadModelRef = useRef<((objText: string) => void) | null>(null);
+  const sceneRef = useRef<THREE.Scene | null>(null);
+  const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
 
   // ── Three.js scene (mount once) ──────────────────────────────────────────
   useEffect(() => {
@@ -24,7 +29,8 @@ export function BuildingViewer() {
     if (!mount) return;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xd4d0c8);
+    scene.background = new THREE.Color(0xE8E8E8);
+    sceneRef.current = scene;
 
     const camera = new THREE.PerspectiveCamera(
       45,
@@ -38,18 +44,32 @@ export function BuildingViewer() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.0;
     // touch-action: none is required for OrbitControls pointer events on both
     // touch devices and browsers that use pointer events (e.g. Chrome).
     renderer.domElement.style.touchAction = "none";
     mount.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
+    cameraRef.current = camera;
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
-    const sun = new THREE.DirectionalLight(0xffffff, 1.0);
-    sun.position.set(80, 120, 60);
-    sun.castShadow = true;
-    scene.add(sun);
 
-    const grid = new THREE.GridHelper(200, 20, 0xa8a49c, 0xb8b4ac);
+    const dirLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight1.position.set(1, 2, 1);
+    dirLight1.castShadow = true;
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.3);
+    dirLight2.position.set(-1, 0.5, -1);
+    scene.add(dirLight2);
+
+    const dirLight3 = new THREE.DirectionalLight(0xcccccc, 0.15);
+    dirLight3.position.set(0, -1, 0);
+    scene.add(dirLight3);
+
+    const grid = new THREE.GridHelper(200, 40, 0xAAAAAA, 0xCCCCCC);
     scene.add(grid);
 
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -68,19 +88,44 @@ export function BuildingViewer() {
 
     let modelGroup: THREE.Group | null = null;
 
-    const material = new THREE.MeshPhongMaterial({
-      color: 0x3cb371,
-      transparent: true,
-      opacity: 0.88,
-      side: THREE.DoubleSide,
-    });
+    const ELEMENT_COLORS: Record<string, number> = {
+      foundation: 0xAAAAAA,
+      structure:  0xBBBBBB,
+      envelope:   0xCCCCCC,
+      floors:     0xB8B8B8,
+      roof:       0xD5D5D5,
+      default:    0xC8C8C8,
+    };
+
+    function makeMaterial(color: number) {
+      return new THREE.MeshPhongMaterial({
+        color,
+        specular: 0x222222,
+        shininess: 15,
+        side: THREE.DoubleSide,
+      });
+    }
+
+    function resolveElementType(name: string): string {
+      const n = name.toLowerCase();
+      if (n.includes("foundation") || n.includes("footing")) return "foundation";
+      if (n.includes("structure") || n.includes("column") || n.includes("beam")) return "structure";
+      if (n.includes("envelope") || n.includes("facade") || n.includes("wall") || n.includes("cladding")) return "envelope";
+      if (n.includes("floor") || n.includes("slab")) return "floors";
+      if (n.includes("roof")) return "roof";
+      return "default";
+    }
 
     // Expose loadModel so the polling effect can call it
     loadModelRef.current = (objText: string) => {
       if (modelGroup) {
         scene.remove(modelGroup);
         modelGroup.traverse((o) => {
-          if (o instanceof THREE.Mesh) o.geometry.dispose();
+          if (o instanceof THREE.Mesh) {
+            o.geometry.dispose();
+            if (Array.isArray(o.material)) o.material.forEach((m) => m.dispose());
+            else o.material.dispose();
+          }
         });
         modelGroup = null;
       }
@@ -90,7 +135,9 @@ export function BuildingViewer() {
 
       obj.traverse((child) => {
         if (child instanceof THREE.Mesh) {
-          child.material = material;
+          const elementType = resolveElementType(child.name || child.parent?.name || "");
+          child.material = makeMaterial(ELEMENT_COLORS[elementType] ?? ELEMENT_COLORS.default);
+          child.userData.elementType = elementType;
           child.castShadow = true;
           child.receiveShadow = true;
         }
@@ -136,12 +183,102 @@ export function BuildingViewer() {
 
     return () => {
       loadModelRef.current = null;
+      sceneRef.current = null;
+      cameraRef.current = null;
+      rendererRef.current = null;
       cancelAnimationFrame(rafId);
       ro.disconnect();
       controls.dispose();
       renderer.dispose();
       mount.removeChild(renderer.domElement);
     };
+  }, []);
+
+  // ── Highlight effect — reruns when selectedElement changes ──────────────────
+  useEffect(() => {
+    const scene = sceneRef.current;
+    if (!scene) return;
+
+    const ELEMENT_COLORS_HIGHLIGHT: Record<string, number> = {
+      foundation: 0xAAAAAA,
+      structure:  0xBBBBBB,
+      envelope:   0xCCCCCC,
+      floors:     0xB8B8B8,
+      roof:       0xD5D5D5,
+      default:    0xC8C8C8,
+    };
+
+    scene.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      const elementType: string = child.userData.elementType ?? "default";
+
+      if (selectedElement === null) {
+        child.material = new THREE.MeshPhongMaterial({
+          color: ELEMENT_COLORS_HIGHLIGHT[elementType] ?? ELEMENT_COLORS_HIGHLIGHT.default,
+          specular: 0x222222,
+          shininess: 15,
+          side: THREE.DoubleSide,
+          transparent: false,
+          opacity: 1,
+        });
+      } else if (elementType === selectedElement) {
+        child.material = new THREE.MeshPhongMaterial({
+          color: 0x1a4731,
+          specular: 0x444444,
+          shininess: 30,
+          side: THREE.DoubleSide,
+          transparent: false,
+          opacity: 1,
+        });
+      } else {
+        child.material = new THREE.MeshPhongMaterial({
+          color: 0x888888,
+          specular: 0x111111,
+          shininess: 5,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.4,
+        });
+      }
+    });
+  }, [selectedElement]);
+
+  // ── Raycasting — click on mesh selects/deselects element ────────────────────
+  useEffect(() => {
+    const renderer = rendererRef.current;
+    const camera = cameraRef.current;
+    const scene = sceneRef.current;
+    if (!renderer || !camera || !scene) return;
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const canvas = renderer.domElement;
+
+    const onClick = (event: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(scene.children, true);
+
+      if (intersects.length > 0) {
+        const clicked = intersects[0].object;
+        const elementType: string | undefined = clicked.userData.elementType;
+        if (elementType) {
+          setSelectedElement(
+            sceneRef.current ? (elementType === (useBuilding.getState().selectedElement) ? null : elementType) : null
+          );
+          return;
+        }
+      }
+      // Click on empty space — deselect
+      setSelectedElement(null);
+    };
+
+    canvas.addEventListener("click", onClick);
+    return () => canvas.removeEventListener("click", onClick);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ── Polling effect — reruns when pollKey changes ─────────────────────────

@@ -14,8 +14,15 @@ export function Header() {
 
   const currentProject = currentProjectId ? projects.find((p) => p.id === currentProjectId) : null;
 
-  const coordStr = plotCenter
-    ? `${Math.abs(plotCenter.lat).toFixed(4)}° ${plotCenter.lat >= 0 ? "N" : "S"}, ${Math.abs(plotCenter.lon).toFixed(4)}° ${plotCenter.lon >= 0 ? "E" : "W"}`
+  const validPlotCenter =
+    plotCenter &&
+    isFinite(plotCenter.lat) &&
+    isFinite(plotCenter.lon) &&
+    Math.abs(plotCenter.lat) <= 90 &&
+    Math.abs(plotCenter.lon) <= 180;
+
+  const coordStr = validPlotCenter
+    ? `${Math.abs(plotCenter!.lat).toFixed(4)}° ${plotCenter!.lat >= 0 ? "N" : "S"}, ${Math.abs(plotCenter!.lon).toFixed(4)}° ${plotCenter!.lon >= 0 ? "E" : "W"}`
     : null;
 
   return (
