@@ -14,13 +14,13 @@ declare global {
 
 function loadGoogleMaps(apiKey: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (window.google?.maps?.places) { resolve(); return; }
+    if (window.google?.maps) { resolve(); return; }
     const existing = document.getElementById("gm-script");
     if (existing) { existing.addEventListener("load", () => resolve()); return; }
     window.initGoogleMapsModal = () => resolve();
     const script = document.createElement("script");
     script.id = "gm-script";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMapsModal`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMapsModal&loading=async&v=weekly`;
     script.async = true;
     script.onerror = () => reject(new Error("Google Maps failed to load"));
     document.head.appendChild(script);
@@ -53,9 +53,9 @@ export function CreateProjectModal() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [mapsReady, setMapsReady] = useState(false);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const autocompleteRef = useRef<any>(null);
+  const placeElementRef = useRef<any>(null);
   const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
 
   // Reset form when modal opens / edit target changes
@@ -83,19 +83,24 @@ export function CreateProjectModal() {
   }, [open, apiKey]);
 
   useEffect(() => {
-    if (!mapsReady || !inputRef.current || autocompleteRef.current) return;
-    autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-      types: ["(cities)", "geocode"],
-    });
-    autocompleteRef.current.addListener("place_changed", () => {
-      const place = autocompleteRef.current?.getPlace();
-      if (!place?.geometry?.location) return;
-      const name = place.formatted_address ?? place.name ?? locationQuery;
-      setLocationQuery(name);
-      setLocation({ name, lat: place.geometry.location.lat(), lng: place.geometry.location.lng() });
-      setLocationSelected(true);
-      setErrors((e) => { const n = { ...e }; delete n.location; return n; });
-    });
+    if (!mapsReady || !containerRef.current || placeElementRef.current) return;
+    (async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { PlaceAutocompleteElement } = await (window.google.maps.importLibrary("places")) as any;
+      const placeAutocomplete = new PlaceAutocompleteElement();
+      placeElementRef.current = placeAutocomplete;
+      containerRef.current!.appendChild(placeAutocomplete);
+      placeAutocomplete.addEventListener("gmp-select", async (event: Event) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const place = (event as any).placePrediction.toPlace();
+        await place.fetchFields({ fields: ["displayName", "formattedAddress", "location"] });
+        const name = place.formattedAddress ?? place.displayName ?? "";
+        setLocationQuery(name);
+        setLocation({ name, lat: place.location.lat(), lng: place.location.lng() });
+        setLocationSelected(true);
+        setErrors((e) => { const n = { ...e }; delete n.location; return n; });
+      });
+    })();
   }, [mapsReady]);
 
   const validate = () => {
@@ -211,20 +216,17 @@ export function CreateProjectModal() {
           <label className="text-[10px] uppercase tracking-wider text-muted-foreground">
             Location <span className="text-red-500">*</span>
           </label>
-          <input
-            ref={inputRef}
-            type="text"
-            value={locationQuery}
-            onChange={(e) => {
-              setLocationQuery(e.target.value);
-              setLocationSelected(false);
-              setLocation(null);
-              setErrors((prev) => { const n = { ...prev }; delete n.location; return n; });
-            }}
-            placeholder={apiKey ? "Search a city…" : "Google Maps API key not set"}
-            disabled={!apiKey}
-            className="w-full h-8 rounded-sm border border-border bg-background px-3 text-xs placeholder:text-muted-foreground focus:outline-none focus:border-primary disabled:opacity-50"
-          />
+          {!apiKey && (
+            <p className="w-full h-8 flex items-center rounded-sm border border-border bg-background px-3 text-xs text-muted-foreground opacity-50">
+              Google Maps API key not set
+            </p>
+          )}
+          {apiKey && (
+            <div
+              ref={containerRef}
+              className="gmp-autocomplete-container"
+            />
+          )}
           {locationSelected && location && (
             <p className="text-[10px] text-green-600">✓ {location.name}</p>
           )}

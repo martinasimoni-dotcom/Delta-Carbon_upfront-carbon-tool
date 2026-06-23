@@ -15,13 +15,13 @@ declare global {
 
 function loadGoogleMaps(apiKey: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (window.google?.maps?.places) { resolve(); return; }
+    if (window.google?.maps) { resolve(); return; }
     const existing = document.getElementById("gm-script");
     if (existing) { existing.addEventListener("load", () => resolve()); return; }
     window.initGoogleMaps = () => resolve();
     const script = document.createElement("script");
     script.id = "gm-script";
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMaps`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGoogleMaps&loading=async&v=weekly`;
     script.async = true;
     script.onerror = () => reject(new Error("Google Maps failed to load"));
     document.head.appendChild(script);
@@ -39,9 +39,9 @@ type SupplierResult = {
 };
 
 export function SupplierSection() {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const autocompleteRef = useRef<any>(null);
+  const placeElementRef = useRef<any>(null);
   const [mapsReady, setMapsReady] = useState(false);
   const [mapsError, setMapsError] = useState<string | null>(null);
   const [calculating, setCalculating] = useState(false);
@@ -53,7 +53,6 @@ export function SupplierSection() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
   const plotCenter = useBuilding((s) => s.plotCenter);
-  const elements = useBuilding((s) => s.elements);
   const setTransportCo2Kg = useBuilding((s) => s.setTransportCo2Kg);
   const setSupplierName = useBuilding((s) => s.setSupplierName);
   const updateCurrentProject = useBuilding((s) => s.updateCurrentProject);
@@ -71,11 +70,60 @@ export function SupplierSection() {
   }, [apiKey]);
 
   useEffect(() => {
-    if (!mapsReady || !inputRef.current || autocompleteRef.current) return;
-    autocompleteRef.current = new window.google.maps.places.Autocomplete(inputRef.current, {
-      types: ["establishment", "geocode"],
-    });
-    autocompleteRef.current.addListener("place_changed", handlePlaceChanged);
+    if (!mapsReady || !containerRef.current || placeElementRef.current) return;
+    (async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { PlaceAutocompleteElement } = await (window.google.maps.importLibrary("places")) as any;
+      const placeAutocomplete = new PlaceAutocompleteElement();
+      placeElementRef.current = placeAutocomplete;
+      containerRef.current!.appendChild(placeAutocomplete);
+      placeAutocomplete.addEventListener("gmp-select", async (event: Event) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const place = (event as any).placePrediction.toPlace();
+        await place.fetchFields({ fields: ["displayName", "formattedAddress", "location"] });
+        const supplierLat = place.location.lat();
+        const supplierLon = place.location.lng();
+        const { plotCenter: pc, elements: els } = useBuilding.getState();
+        if (!pc) { setError("Set a site location first (section 01 SITE)."); return; }
+        setSupplierCoords({ lat: supplierLat, lng: supplierLon });
+        setCalculating(true);
+        setError(null);
+        setResult(null);
+        try {
+          const service = new window.google.maps.DistanceMatrixService();
+          const response = await service.getDistanceMatrix({
+            origins: [{ lat: supplierLat, lng: supplierLon }],
+            destinations: [{ lat: pc.lat, lng: pc.lon }],
+            travelMode: window.google.maps.TravelMode.DRIVING,
+            unitSystem: window.google.maps.UnitSystem.METRIC,
+          });
+          const element = response.rows[0]?.elements[0];
+          if (!element || element.status !== "OK") throw new Error("Distance Matrix returned no result");
+          const distanceKm = element.distance.value / 1000;
+          const heaviest = [...els].sort((a, b) => b.volumeM3 - a.volumeM3)[0];
+          const mat = getMaterial(heaviest.materialId);
+          const weightTonnes = (heaviest.volumeM3 * mat.density) / 1000;
+          const transportCo2Kg = distanceKm * weightTonnes * TRANSPORT_FACTOR;
+          const res: SupplierResult = {
+            name: place.displayName ?? "Supplier",
+            address: place.formattedAddress ?? "",
+            lat: supplierLat,
+            lon: supplierLon,
+            distanceKm: Math.round(distanceKm),
+            weightTonnes: Math.round(weightTonnes * 10) / 10,
+            transportCo2Kg: Math.round(transportCo2Kg),
+          };
+          setResult(res);
+          setTransportCo2Kg(transportCo2Kg);
+          setSupplierName(res.name);
+          updateCurrentProject();
+        } catch (e) {
+          setError(`Distance calculation failed: ${e instanceof Error ? e.message : String(e)}`);
+        } finally {
+          setCalculating(false);
+        }
+      });
+    })();
   }, [mapsReady]);
 
   // ── Mapbox map ──────────────────────────────────────────────────────────────
@@ -140,65 +188,6 @@ export function SupplierSection() {
     return () => { map.remove(); mapRef.current = null; };
   }, [supplierCoords, plotCenter]);
 
-  const handlePlaceChanged = async () => {
-    const place = autocompleteRef.current?.getPlace();
-    if (!place?.geometry?.location) return;
-    if (!plotCenter) {
-      setError("Set a site location first (section 01 SITE).");
-      return;
-    }
-
-    const supplierLat = place.geometry.location.lat();
-    const supplierLon = place.geometry.location.lng();
-    setSupplierCoords({ lat: supplierLat, lng: supplierLon });
-
-    setCalculating(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      // Distance Matrix API: supplier → project plot
-      const service = new window.google.maps.DistanceMatrixService();
-      const response = await service.getDistanceMatrix({
-        origins: [{ lat: supplierLat, lng: supplierLon }],
-        destinations: [{ lat: plotCenter.lat, lng: plotCenter.lon }],
-        travelMode: window.google.maps.TravelMode.DRIVING,
-        unitSystem: window.google.maps.UnitSystem.METRIC,
-      });
-
-      const element = response.rows[0]?.elements[0];
-      if (!element || element.status !== "OK") {
-        throw new Error("Distance Matrix returned no result");
-      }
-
-      const distanceKm = element.distance.value / 1000;
-
-      // Use the largest-volume element's material density for weight estimate
-      const heaviest = [...elements].sort((a, b) => b.volumeM3 - a.volumeM3)[0];
-      const mat = getMaterial(heaviest.materialId);
-      const weightTonnes = (heaviest.volumeM3 * mat.density) / 1000;
-      const transportCo2Kg = distanceKm * weightTonnes * TRANSPORT_FACTOR;
-
-      const res: SupplierResult = {
-        name: place.name ?? "Supplier",
-        address: place.formatted_address ?? "",
-        lat: supplierLat,
-        lon: supplierLon,
-        distanceKm: Math.round(distanceKm),
-        weightTonnes: Math.round(weightTonnes * 10) / 10,
-        transportCo2Kg: Math.round(transportCo2Kg),
-      };
-
-      setResult(res);
-      setTransportCo2Kg(transportCo2Kg);
-      setSupplierName(res.name);
-      updateCurrentProject();
-    } catch (e) {
-      setError(`Distance calculation failed: ${e instanceof Error ? e.message : String(e)}`);
-    } finally {
-      setCalculating(false);
-    }
-  };
 
   if (!apiKey) {
     return (
@@ -218,13 +207,7 @@ export function SupplierSection() {
         Search a supplier location. Road distance × material weight × 0.062 kg CO₂e/t·km = A4 transport carbon.
       </p>
 
-      <input
-        ref={inputRef}
-        type="text"
-        placeholder={mapsReady ? "Search supplier address…" : "Loading Maps…"}
-        disabled={!mapsReady || !plotCenter}
-        className="w-full rounded-sm border border-border bg-background px-3 py-2 text-xs placeholder:text-muted-foreground disabled:opacity-50 focus:outline-none focus:border-primary"
-      />
+      <div ref={containerRef} className="gmp-autocomplete-container" />
 
       {!plotCenter && (
         <p className="text-[10px] text-muted-foreground">Set a site location first.</p>

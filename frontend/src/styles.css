@@ -144,3 +144,36 @@
     font-feature-settings: "ss01";
   }
 }
+
+/* PlaceAutocompleteElement (Places API New) */
+.gmp-autocomplete-container {
+  width: 100%;
+  display: block;
+}
+
+gmp-place-autocomplete {
+  width: 100%;
+  display: block;
+}
+
+gmp-place-autocomplete input {
+  width: 100%;
+  height: 2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--background);
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+  font-family: inherit;
+  color: var(--foreground);
+  outline: none;
+  box-sizing: border-box;
+}
+
+gmp-place-autocomplete input:focus {
+  border-color: var(--primary);
+}
+
+gmp-place-autocomplete input::placeholder {
+  color: var(--muted-foreground);
+}

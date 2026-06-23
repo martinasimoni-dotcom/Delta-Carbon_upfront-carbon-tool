@@ -75,9 +75,9 @@ namespace DeltaCarbon.Commands
 
             if (estimate?.BaselineCarbon != null)
                 RhinoApp.WriteLine($"DELTA CARBON: Synced — {estimate.BaselineCarbon.TotalTonnes:F0} t CO₂e " +
-                                   $"({estimate.BaselineCarbon.PerM2:F0} kg/m²). View at http://localhost:5173");
+                                   $"({estimate.BaselineCarbon.PerM2:F0} kg/m²). View at http://localhost:8080");
             else
-                RhinoApp.WriteLine("DELTA CARBON: Sync failed — is the web interface running at http://localhost:5173?");
+                RhinoApp.WriteLine("DELTA CARBON: Sync failed — is the web interface running at http://localhost:8080?");
         }
 
         private static async Task ExportAndUploadObjAsync(RhinoDoc doc)
@@ -145,7 +145,7 @@ namespace DeltaCarbon.Commands
                 using (var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) })
                 using (var content = new StringContent(objText, Encoding.UTF8, "model/obj"))
                 {
-                    var response = await http.PostAsync("http://localhost:5173/api/model/upload", content)
+                    var response = await http.PostAsync("http://localhost:8080/api/model/upload", content)
                                              .ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
                         RhinoApp.WriteLine("DELTA CARBON: OBJ uploaded to web viewer.");
@@ -170,7 +170,7 @@ namespace DeltaCarbon.Commands
             {
                 using (var http = new HttpClient { Timeout = TimeSpan.FromSeconds(3) })
                 {
-                    var json = await http.GetStringAsync("http://localhost:5173/api/plot/select")
+                    var json = await http.GetStringAsync("http://localhost:8080/api/plot/select")
                                          .ConfigureAwait(false);
                     var result = JsonConvert.DeserializeObject<PlotResponse>(json);
                     if (result?.Ready == true)

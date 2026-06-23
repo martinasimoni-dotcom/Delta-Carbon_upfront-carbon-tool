@@ -72,7 +72,7 @@ namespace DeltaCarbon.UI
         private void OnChooseProject(object sender, EventArgs e)
         {
             // Open the web dashboard in the default browser
-            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("http://localhost:5173") { UseShellExecute = true }); }
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("http://localhost:8080") { UseShellExecute = true }); }
             catch (Exception ex) { RhinoApp.WriteLine($"Delta Carbon: could not open browser — {ex.Message}"); }
         }
 
@@ -106,7 +106,7 @@ namespace DeltaCarbon.UI
         {
             try
             {
-                var json = await _http.GetStringAsync("http://localhost:5173/api/plugin/project");
+                var json = await _http.GetStringAsync("http://localhost:8080/api/plugin/project");
                 // Simple JSON parse — avoid adding a dependency on System.Text.Json or Newtonsoft
                 var name = ExtractJsonString(json, "projectName");
                 if (name != null && name != _currentProjectName)

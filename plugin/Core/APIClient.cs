@@ -20,7 +20,7 @@ namespace DeltaCarbon.Core
         // Override by storing a URL in Credential Manager target "SurroundPlugin_URL",
         // or by passing baseUrl explicitly. Defaults to local Vite dev server.
         // For production deployment, store the remote URL in Credential Manager target "SurroundPlugin_URL".
-        private const string DefaultBaseUrl   = "http://localhost:5173";
+        private const string DefaultBaseUrl   = "http://localhost:8080";
         private const string CredentialTarget  = "SurroundPlugin";
         private const string UrlCredTarget     = "SurroundPlugin_URL";
         private const string EstimateEndpoint  = "/v1/carbon/estimate";
