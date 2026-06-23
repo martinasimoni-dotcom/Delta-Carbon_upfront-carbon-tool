@@ -157,7 +157,7 @@ export function MapInfoSection() {
                   <span>✓</span> Plot sent — run <span className="font-mono font-bold">SurroundSetOrigin</span> in Rhino
                 </div>
                 <div className="text-[10px] text-muted-foreground">
-                  Then build your model at (0,0,0) and run <span className="font-mono font-bold">SurroundSync</span> to sync.
+                  Then build your model at (0,0,0) and run <span className="font-mono font-bold">DeltaCarbonSync</span> to sync.
                 </div>
               </div>
             )}

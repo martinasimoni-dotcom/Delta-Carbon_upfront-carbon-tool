@@ -62,11 +62,11 @@ function RhinoConnectSection() {
           {status === "syncing" ? "Syncing…" :
            status === "error"   ? "Connection failed" :
            lastSync             ? `Last sync ${lastSync.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` :
-           "Run SurroundSync in Rhino"}
+           "Run DeltaCarbonSync in Rhino"}
         </span>
       </div>
       <p className="text-[10px] text-muted-foreground leading-relaxed">
-        Run <code className="bg-muted px-1 rounded text-foreground">SurroundSync</code> inside
+        Run <code className="bg-muted px-1 rounded text-foreground">DeltaCarbonSync</code> inside
         Rhino to push the current model geometry and carbon data here.
       </p>
       <button

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace SurroundPlugin.Models
+namespace DeltaCarbon.Models
 {
     /// <summary>Geographic coordinates of the building site.</summary>
     public class Location

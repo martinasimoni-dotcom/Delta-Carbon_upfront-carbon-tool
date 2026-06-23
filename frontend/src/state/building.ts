@@ -119,6 +119,7 @@ type State = {
   loadOption: (optionId: string) => void;
   deleteOption: (optionId: string) => void;
   renameOption: (optionId: string, newName: string) => void;
+  setOptionRender: (optionId: string, renderUrl: string) => void;
 
   // ── auth ──────────────────────────────────────────────────────────────────────
   isLoggedIn: boolean;
@@ -343,6 +344,18 @@ export const useBuilding = create<State>()(
           projects: projects.map((p) =>
             p.id === currentProjectId
               ? { ...p, options: (p.options ?? []).map((o) => o.id === optionId ? { ...o, name: newName } : o) }
+              : p,
+          ),
+        });
+      },
+
+      setOptionRender: (optionId, renderUrl) => {
+        const { currentProjectId, projects } = get();
+        if (!currentProjectId) return;
+        set({
+          projects: projects.map((p) =>
+            p.id === currentProjectId
+              ? { ...p, options: (p.options ?? []).map((o) => o.id === optionId ? { ...o, renderUrl } : o) }
               : p,
           ),
         });

@@ -59,7 +59,7 @@ export function CarbonDeltaPanel() {
             Demo building figures pending
           </div>
           <div className="text-[11px] text-[#6a6a66]">
-            Run SurroundSync on the demo building to populate before/after data
+            Run DeltaCarbonSync on the demo building to populate before/after data
           </div>
         </div>
       </div>

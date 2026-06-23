@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace SurroundPlugin.Models
+namespace DeltaCarbon.Models
 {
     /// <summary>Structural element types, mapped from Rhino layer names.</summary>
     public enum ElementType

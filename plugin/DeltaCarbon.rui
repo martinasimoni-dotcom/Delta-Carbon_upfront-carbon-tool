@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  SURROUND Carbon — Rhino toolbar definition.
+  Delta Carbon — Rhino toolbar definition.
   To load: drag this .rui file into Rhino, or use Tools > Toolbar Layout > File > Open.
-  The button runs the SurroundAnalyze command.
+  The button runs the DeltaCarbonAnalyze command.
 -->
 <RhinoUI major_ver="1" minor_ver="0">
-  <tool_bar_collection name="SURROUND">
-    <tool_bar name="SURROUND Carbon" uuid="{7D8E9F0A-1B2C-3D4E-5F6A-7B8C9D0E1F2A}">
+  <tool_bar_collection name="DeltaCarbon">
+    <tool_bar name="Delta Carbon" uuid="{7D8E9F0A-1B2C-3D4E-5F6A-7B8C9D0E1F2A}">
 
       <tool_bar_item>
         <id>{2A3B4C5D-6E7F-8A9B-0C1D-2E3F4A5B6C7D}</id>
         <button_text>Analyze Carbon</button_text>
-        <tooltip_text>Run SURROUND embodied carbon analysis on the current model</tooltip_text>
+        <tooltip_text>Run Delta Carbon embodied carbon analysis on the current model</tooltip_text>
         <help_text>Extracts geometry from visible layers and returns an A1-A3 carbon estimate.</help_text>
         <left_macro>
-          <script>_SurroundAnalyze</script>
+          <script>_DeltaCarbonAnalyze</script>
         </left_macro>
         <!-- Programmatic 32×32 icon — Rhino renders button_text as fallback if no bitmap -->
       </tool_bar_item>
@@ -22,18 +22,18 @@
       <tool_bar_item>
         <id>{3B4C5D6E-7F8A-9B0C-1D2E-3F4A5B6C7D8E}</id>
         <button_text>Materials</button_text>
-        <tooltip_text>Open SURROUND material picker</tooltip_text>
+        <tooltip_text>Open Delta Carbon material picker</tooltip_text>
         <left_macro>
-          <script>_SurroundMaterials</script>
+          <script>_DeltaCarbonMaterials</script>
         </left_macro>
       </tool_bar_item>
 
       <tool_bar_item>
         <id>{4C5D6E7F-8A9B-0C1D-2E3F-4A5B6C7D8E9F}</id>
         <button_text>Export PDF</button_text>
-        <tooltip_text>Export SURROUND Material Passport PDF</tooltip_text>
+        <tooltip_text>Export Delta Carbon Material Passport PDF</tooltip_text>
         <left_macro>
-          <script>_SurroundExport</script>
+          <script>_DeltaCarbonExport</script>
         </left_macro>
       </tool_bar_item>
 

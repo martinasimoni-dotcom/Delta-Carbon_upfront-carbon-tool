@@ -1,9 +1,9 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace SurroundPlugin.Models
+namespace DeltaCarbon.Models
 {
-    /// <summary>Full request payload sent to the SURROUND carbon estimate API.</summary>
+    /// <summary>Full request payload sent to the Delta Carbon estimate API.</summary>
     public class BuildingData
     {
         [JsonProperty("location")]

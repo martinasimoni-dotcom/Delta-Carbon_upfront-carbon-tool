@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
 import { useBuilding } from "@/state/building";
 import { getMaterial } from "@/lib/materials";
 
@@ -6,7 +7,8 @@ const TRANSPORT_FACTOR = 0.062; // kg CO₂e per tonne-km (road freight)
 
 declare global {
   interface Window {
-    google: typeof google;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    google: any;
     initGoogleMaps?: () => void;
   }
 }
@@ -38,12 +40,17 @@ type SupplierResult = {
 
 export function SupplierSection() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const autocompleteRef = useRef<any>(null);
   const [mapsReady, setMapsReady] = useState(false);
   const [mapsError, setMapsError] = useState<string | null>(null);
   const [calculating, setCalculating] = useState(false);
   const [result, setResult] = useState<SupplierResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [supplierCoords, setSupplierCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
 
   const plotCenter = useBuilding((s) => s.plotCenter);
   const elements = useBuilding((s) => s.elements);
@@ -71,6 +78,68 @@ export function SupplierSection() {
     autocompleteRef.current.addListener("place_changed", handlePlaceChanged);
   }, [mapsReady]);
 
+  // ── Mapbox map ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!supplierCoords || !plotCenter || !mapContainerRef.current) return;
+
+    if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
+
+    const mbToken = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
+    if (!mbToken) return;
+
+    mapboxgl.accessToken = mbToken;
+
+    const bounds = new mapboxgl.LngLatBounds();
+    bounds.extend([plotCenter.lon, plotCenter.lat]);
+    bounds.extend([supplierCoords.lng, supplierCoords.lat]);
+
+    const map = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: "mapbox://styles/mapbox/light-v11",
+      bounds,
+      fitBoundsOptions: { padding: 40 },
+      interactive: false,
+    });
+    mapRef.current = map;
+
+    map.on("load", () => {
+      new mapboxgl.Marker({ color: "#1a4731" })
+        .setLngLat([plotCenter.lon, plotCenter.lat])
+        .setPopup(new mapboxgl.Popup().setText("Project"))
+        .addTo(map);
+
+      new mapboxgl.Marker({ color: "#EF4444" })
+        .setLngLat([supplierCoords.lng, supplierCoords.lat])
+        .setPopup(new mapboxgl.Popup().setText(result?.name ?? "Supplier"))
+        .addTo(map);
+
+      map.addSource("route", {
+        type: "geojson",
+        data: {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [plotCenter.lon, plotCenter.lat],
+              [supplierCoords.lng, supplierCoords.lat],
+            ],
+          },
+        },
+      });
+
+      map.addLayer({
+        id: "route",
+        type: "line",
+        source: "route",
+        layout: { "line-join": "round", "line-cap": "round" },
+        paint: { "line-color": "#1a4731", "line-width": 2, "line-dasharray": [2, 2] },
+      });
+    });
+
+    return () => { map.remove(); mapRef.current = null; };
+  }, [supplierCoords, plotCenter]);
+
   const handlePlaceChanged = async () => {
     const place = autocompleteRef.current?.getPlace();
     if (!place?.geometry?.location) return;
@@ -81,6 +150,7 @@ export function SupplierSection() {
 
     const supplierLat = place.geometry.location.lat();
     const supplierLon = place.geometry.location.lng();
+    setSupplierCoords({ lat: supplierLat, lng: supplierLon });
 
     setCalculating(true);
     setError(null);
@@ -158,6 +228,21 @@ export function SupplierSection() {
 
       {!plotCenter && (
         <p className="text-[10px] text-muted-foreground">Set a site location first.</p>
+      )}
+
+      {/* Map — shown once supplier is selected */}
+      {supplierCoords && plotCenter && (
+        <div
+          ref={mapContainerRef}
+          className="w-full rounded-sm border border-[#E5E7EB] overflow-hidden"
+          style={{ height: "180px" }}
+        />
+      )}
+
+      {supplierCoords && !plotCenter && (
+        <p className="text-[11px] text-[#EAB308]">
+          ⚠ Set a project location in section 01 SITE to see the route map
+        </p>
       )}
 
       {calculating && (

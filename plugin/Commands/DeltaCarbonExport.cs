@@ -2,20 +2,20 @@ using System;
 using Rhino;
 using Rhino.Commands;
 
-namespace SurroundPlugin.Commands
+namespace DeltaCarbon.Commands
 {
     /// <summary>
-    /// "SurroundExport" — exports the Material Passport PDF.
+    /// "DeltaCarbonExport" — exports the Material Passport PDF.
     /// Full implementation in Phase 2 (PdfSharp); stub present so toolbar button compiles.
     /// </summary>
     [CommandStyle(Style.Hidden)]
-    public class SurroundExport : Command
+    public class DeltaCarbonExport : Command
     {
-        public override string EnglishName => "SurroundExport";
+        public override string EnglishName => "DeltaCarbonExport";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            RhinoApp.WriteLine("SURROUND: PDF export will be available in Phase 2.");
+            RhinoApp.WriteLine("DELTA CARBON: PDF export will be available in Phase 2.");
             return Result.Success;
         }
     }

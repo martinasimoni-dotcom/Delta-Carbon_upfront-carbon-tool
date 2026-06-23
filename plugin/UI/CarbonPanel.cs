@@ -6,7 +6,7 @@ using Eto.Forms;
 using Rhino;
 using Rhino.UI;
 
-namespace SurroundPlugin.UI
+namespace DeltaCarbon.UI
 {
     /// <summary>
     /// Docked Delta Carbon panel — minimal: Choose Project + Sync.
@@ -82,7 +82,7 @@ namespace SurroundPlugin.UI
             _btnSync.Enabled = false;
             _btnChooseProject.Enabled = false;
 
-            await Task.Run(() => RhinoApp.RunScript("SurroundSync", false));
+            await Task.Run(() => RhinoApp.RunScript("DeltaCarbonSync", false));
 
             Application.Instance.Invoke(() =>
             {

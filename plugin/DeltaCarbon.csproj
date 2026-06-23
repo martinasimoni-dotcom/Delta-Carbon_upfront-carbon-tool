@@ -5,11 +5,11 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <OutputType>Library</OutputType>
-    <AssemblyName>SurroundPlugin</AssemblyName>
-    <RootNamespace>SurroundPlugin</RootNamespace>
-    <AssemblyTitle>SURROUND Carbon Plugin for Rhino</AssemblyTitle>
-    <Company>SURROUND</Company>
-    <Product>SURROUND Carbon</Product>
+    <AssemblyName>DeltaCarbon</AssemblyName>
+    <RootNamespace>DeltaCarbon</RootNamespace>
+    <AssemblyTitle>Delta Carbon Plugin</AssemblyTitle>
+    <Company>Delta Carbon</Company>
+    <Product>Delta Carbon</Product>
     <Description>Real-time embodied carbon assessment for Rhino 7/8</Description>
     <PlatformTarget>x64</PlatformTarget>
     <Platforms>x64</Platforms>
@@ -62,7 +62,7 @@
     <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll"
           DestinationFiles="$(OutputPath)$(AssemblyName).rhp"
           SkipUnchangedFiles="true" />
-    <Message Text="SURROUND: Output → $(OutputPath)$(AssemblyName).rhp" Importance="high" />
+    <Message Text="DELTA CARBON: Output → $(OutputPath)$(AssemblyName).rhp" Importance="high" />
   </Target>
 
 </Project>

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using SurroundPlugin.Models;
+using DeltaCarbon.Models;
 
-namespace SurroundPlugin.Core
+namespace DeltaCarbon.Core
 {
     // Carbon coefficients source: BEDEC/ITeC (Institut de Tecnologia de la Construcció de Catalunya)
     // Values: kg CO₂e/m³ at A1–A3. Retrieved via 2050-materials API, country="ES".
@@ -38,7 +38,7 @@ namespace SurroundPlugin.Core
             if (EpdCoefficients.TryGetValue(materialName, out double coeff))
                 return volumeM3 * coeff;
 
-            Rhino.RhinoApp.WriteLine($"SURROUND: Unknown material '{materialName}' — carbon set to 0.");
+            Rhino.RhinoApp.WriteLine($"DELTA CARBON: Unknown material '{materialName}' — carbon set to 0.");
             return 0;
         }
 

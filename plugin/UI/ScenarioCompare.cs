@@ -1,6 +1,6 @@
 using Eto.Forms;
 
-namespace SurroundPlugin.UI
+namespace DeltaCarbon.UI
 {
     /// <summary>
     /// Baseline vs alternative scenario comparison view — Phase 2 feature.

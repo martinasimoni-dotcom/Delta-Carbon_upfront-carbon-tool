@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace SurroundPlugin.Models
+namespace DeltaCarbon.Models
 {
     /// <summary>Carbon contribution from one building element in the API response breakdown.</summary>
     public class CarbonBreakdownItem

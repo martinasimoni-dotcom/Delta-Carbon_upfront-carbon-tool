@@ -5,16 +5,16 @@ using Newtonsoft.Json;
 using Rhino;
 using Rhino.Commands;
 
-namespace SurroundPlugin.Commands
+namespace DeltaCarbon.Commands
 {
-    public class SurroundSetOrigin : Command
+    public class DeltaCarbonSetOrigin : Command
     {
-        public override string EnglishName => "SurroundSetOrigin";
+        public override string EnglishName => "DeltaCarbonSetOrigin";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
             try { RunAsync(doc).GetAwaiter().GetResult(); }
-            catch (Exception ex) { RhinoApp.WriteLine($"SURROUND: SetOrigin error: {ex.Message}"); }
+            catch (Exception ex) { RhinoApp.WriteLine($"DELTA CARBON: SetOrigin error: {ex.Message}"); }
             return Result.Success;
         }
 
@@ -34,7 +34,7 @@ namespace SurroundPlugin.Commands
 
             if (plot == null || !plot.Ready)
             {
-                RhinoApp.WriteLine("SURROUND: No plot selected in browser. " +
+                RhinoApp.WriteLine("DELTA CARBON: No plot selected in browser. " +
                                    "Select a plot on the web interface and click \"Send to Rhino\" first.");
                 return;
             }
@@ -46,7 +46,7 @@ namespace SurroundPlugin.Commands
             doc.EarthAnchorPoint = anchor;
             doc.Modified = true;
 
-            RhinoApp.WriteLine($"SURROUND: Origin set to {plot.Lat:F6}, {plot.Lon:F6}. " +
+            RhinoApp.WriteLine($"DELTA CARBON: Origin set to {plot.Lat:F6}, {plot.Lon:F6}. " +
                                "Build your model at (0,0,0) and run SurroundSync to sync.");
         }
 

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Rhino;
 using Rhino.DocObjects;
 using Rhino.Geometry;
-using SurroundPlugin.Models;
+using DeltaCarbon.Models;
 
-namespace SurroundPlugin.Core
+namespace DeltaCarbon.Core
 {
     /// <summary>
     /// Reads the active Rhino document and produces a BuildingData object by:
@@ -127,7 +127,7 @@ namespace SurroundPlugin.Core
             }
             catch (Exception ex)
             {
-                RhinoApp.WriteLine($"SURROUND: Volume compute error on {rhinoObj.Id}: {ex.Message}");
+                RhinoApp.WriteLine($"DELTA CARBON: Volume compute error on {rhinoObj.Id}: {ex.Message}");
                 return 0;
             }
         }
@@ -162,7 +162,7 @@ namespace SurroundPlugin.Core
             }
             catch (Exception ex)
             {
-                RhinoApp.WriteLine($"SURROUND: EarthAnchorPoint read error: {ex.Message}");
+                RhinoApp.WriteLine($"DELTA CARBON: EarthAnchorPoint read error: {ex.Message}");
             }
 
             return null; // caller must prompt user
@@ -198,7 +198,7 @@ namespace SurroundPlugin.Core
             }
             catch (Exception ex)
             {
-                RhinoApp.WriteLine($"SURROUND: Bounding box error: {ex.Message}");
+                RhinoApp.WriteLine($"DELTA CARBON: Bounding box error: {ex.Message}");
                 return (0, 0, 0);
             }
         }

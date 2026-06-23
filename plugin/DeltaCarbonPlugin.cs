@@ -6,27 +6,27 @@ using System.IO;
 using Rhino;
 using Rhino.PlugIns;
 using Rhino.UI;
-using SurroundPlugin.Core;
+using DeltaCarbon.Core;
 
-namespace SurroundPlugin
+namespace DeltaCarbon
 {
     /// <summary>
     /// Plugin entry point. Rhino instantiates this class on load.
     /// Registers the carbon panel and exposes the shared APIClient singleton.
     /// </summary>
     [Guid("8F3A2B1C-4D5E-6F7A-8B9C-0D1E2F3A4B5C")]
-    public class SurroundPlugin : PlugIn
+    public class DeltaCarbonPlugin : PlugIn
     {
-        private static SurroundPlugin _instance;
+        private static DeltaCarbonPlugin _instance;
         private APIClient _apiClient;
 
         /// <summary>Shared plugin instance — available after OnLoad.</summary>
-        public static SurroundPlugin Instance => _instance;
+        public static DeltaCarbonPlugin Instance => _instance;
 
         /// <summary>Shared HTTP client. Initialised once; reused across commands.</summary>
         public APIClient ApiClient => _apiClient;
 
-        public SurroundPlugin()
+        public DeltaCarbonPlugin()
         {
             _instance = this;
         }
@@ -44,12 +44,12 @@ namespace SurroundPlugin
                     "Delta Carbon",
                     MakePanelIcon());
 
-                RhinoApp.WriteLine("SURROUND: Plugin loaded. Run \"SurroundAnalyze\" to begin.");
+                RhinoApp.WriteLine("DELTA CARBON: Plugin loaded. Run \"DeltaCarbonAnalyze\" to begin.");
                 return LoadReturnCode.Success;
             }
             catch (Exception ex)
             {
-                errorMessage = $"SURROUND failed to load: {ex.Message}";
+                errorMessage = $"Delta Carbon failed to load: {ex.Message}";
                 RhinoApp.WriteLine(errorMessage);
                 return LoadReturnCode.ErrorShowDialog;
             }

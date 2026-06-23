@@ -10,8 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EvidenceRouteImport } from './routes/evidence'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CompareRouteImport } from './routes/compare'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiPublicParcelsRouteImport } from './routes/api/public/parcels'
 import { Route as ApiPluginEstimateRouteImport } from './routes/api/plugin/estimate'
@@ -21,14 +22,19 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EvidenceRoute = EvidenceRouteImport.update({
+  id: '/evidence',
+  path: '/evidence',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EvidenceRoute = EvidenceRouteImport.update({
-  id: '/evidence',
-  path: '/evidence',
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -49,49 +55,68 @@ const ApiPluginEstimateRoute = ApiPluginEstimateRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
   '/evidence': typeof EvidenceRoute
+  '/login': typeof LoginRoute
   '/api/plugin/estimate': typeof ApiPluginEstimateRoute
   '/api/public/parcels': typeof ApiPublicParcelsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
   '/evidence': typeof EvidenceRoute
+  '/login': typeof LoginRoute
   '/api/plugin/estimate': typeof ApiPluginEstimateRoute
   '/api/public/parcels': typeof ApiPublicParcelsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
+  '/compare': typeof CompareRoute
   '/dashboard': typeof DashboardRoute
   '/evidence': typeof EvidenceRoute
+  '/login': typeof LoginRoute
   '/api/plugin/estimate': typeof ApiPluginEstimateRoute
   '/api/public/parcels': typeof ApiPublicParcelsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard' | '/evidence' | '/api/plugin/estimate' | '/api/public/parcels'
+  fullPaths:
+    | '/'
+    | '/compare'
+    | '/dashboard'
+    | '/evidence'
+    | '/login'
+    | '/api/plugin/estimate'
+    | '/api/public/parcels'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard' | '/evidence' | '/api/plugin/estimate' | '/api/public/parcels'
+  to:
+    | '/'
+    | '/compare'
+    | '/dashboard'
+    | '/evidence'
+    | '/login'
+    | '/api/plugin/estimate'
+    | '/api/public/parcels'
   id:
     | '__root__'
     | '/'
-    | '/login'
+    | '/compare'
     | '/dashboard'
     | '/evidence'
+    | '/login'
     | '/api/plugin/estimate'
     | '/api/public/parcels'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  LoginRoute: typeof LoginRoute
+  CompareRoute: typeof CompareRoute
   DashboardRoute: typeof DashboardRoute
   EvidenceRoute: typeof EvidenceRoute
+  LoginRoute: typeof LoginRoute
   ApiPluginEstimateRoute: typeof ApiPluginEstimateRoute
   ApiPublicParcelsRoute: typeof ApiPublicParcelsRoute
 }
@@ -105,6 +130,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/evidence': {
+      id: '/evidence'
+      path: '/evidence'
+      fullPath: '/evidence'
+      preLoaderRoute: typeof EvidenceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -112,11 +144,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/evidence': {
-      id: '/evidence'
-      path: '/evidence'
-      fullPath: '/evidence'
-      preLoaderRoute: typeof EvidenceRouteImport
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -145,9 +177,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  LoginRoute: LoginRoute,
+  CompareRoute: CompareRoute,
   DashboardRoute: DashboardRoute,
   EvidenceRoute: EvidenceRoute,
+  LoginRoute: LoginRoute,
   ApiPluginEstimateRoute: ApiPluginEstimateRoute,
   ApiPublicParcelsRoute: ApiPublicParcelsRoute,
 }

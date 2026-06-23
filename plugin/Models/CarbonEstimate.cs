@@ -1,7 +1,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace SurroundPlugin.Models
+namespace DeltaCarbon.Models
 {
     /// <summary>Full response from POST /v1/carbon/estimate.</summary>
     public class CarbonEstimate

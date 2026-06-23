@@ -177,7 +177,7 @@ export function OptionsSection() {
       {/* Compare button */}
       {options.length >= 2 && (
         <button
-          onClick={() => navigate({ to: "/compare" as never })}
+          onClick={() => navigate({ to: "/compare" })}
           className="w-full py-2 text-[11px] font-semibold uppercase tracking-wider border border-[#E5E7EB] text-foreground hover:border-foreground transition-colors rounded-sm"
         >
           Compare Options →

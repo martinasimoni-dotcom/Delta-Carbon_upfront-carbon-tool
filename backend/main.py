@@ -100,6 +100,17 @@ class SuggestionRequest(BaseModel):
     building_use: str = "residential"
     country: str = "ES"
 
+class RenderElementIn(BaseModel):
+    type: str
+    material: str
+
+class RenderRequest(BaseModel):
+    option_name: str
+    building_use: str = "Office"
+    location: str = "Barcelona, Spain"
+    elements: list[RenderElementIn]
+    total_co2_kg: float
+
 # ── Rashi geometry fallback ───────────────────────────────────────────────────
 
 def _run_rashi_fallback(obj_text: str, footprint_m2: float) -> dict[str, float]:
@@ -335,3 +346,42 @@ If fewer than 3 records have valid GWP values, return however many are valid."""
         "retrieved_epds_count": len(records_for_llm),
         "source": "BEDEC/ITeC via 2050-materials API",
     }
+
+# ── /v1/render ────────────────────────────────────────────────────────────────
+
+@app.post("/v1/render")
+def render(req: RenderRequest):
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        raise HTTPException(status_code=503, detail="OPENAI_API_KEY not set — render unavailable")
+
+    import openai
+    client = openai.OpenAI(api_key=api_key)
+
+    materials_desc = ", ".join([f"{el.type}: {el.material}" for el in req.elements])
+    is_regenerative = req.total_co2_kg < 0
+    timber_note = "The building uses biogenic timber materials with a warm natural aesthetic. " if any(
+        kw in materials_desc.lower() for kw in ("clt", "timber", "straw")
+    ) else ""
+    regen_note = "Regenerative carbon-positive building design. " if is_regenerative else ""
+
+    prompt = (
+        f"Photorealistic architectural exterior render of a modern {req.building_use.lower()} building in {req.location}. "
+        f"Materials: {materials_desc}. "
+        f"Style: professional architectural visualization, natural daylight, high quality, "
+        f"clean background, contemporary design. "
+        f"{timber_note}"
+        f"{regen_note}"
+        f"No people, no text, no watermarks."
+    )
+
+    response = client.images.generate(
+        model="dall-e-3",
+        prompt=prompt,
+        size="1792x1024",
+        quality="standard",
+        n=1,
+    )
+
+    image_url = response.data[0].url
+    return {"image_url": image_url, "prompt_used": prompt}

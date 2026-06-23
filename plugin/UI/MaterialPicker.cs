@@ -1,10 +1,10 @@
 using System;
 using Eto.Forms;
 using Eto.Drawing;
-using SurroundPlugin.Core;
-using SurroundPlugin.Models;
+using DeltaCarbon.Core;
+using DeltaCarbon.Models;
 
-namespace SurroundPlugin.UI
+namespace DeltaCarbon.UI
 {
     /// <summary>
     /// Material picker dialog — Phase 2 feature.

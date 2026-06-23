@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace SurroundPlugin.Models
+namespace DeltaCarbon.Models
 {
     /// <summary>
     /// EPD material data entry from the local cache (MaterialePyramiden source).

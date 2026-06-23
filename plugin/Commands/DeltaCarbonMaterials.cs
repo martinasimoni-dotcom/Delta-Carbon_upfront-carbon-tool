@@ -2,16 +2,16 @@ using System;
 using Rhino;
 using Rhino.Commands;
 
-namespace SurroundPlugin.Commands
+namespace DeltaCarbon.Commands
 {
     /// <summary>
-    /// "SurroundMaterials" — opens the material picker dialog.
+    /// "DeltaCarbonMaterials" — opens the material picker dialog.
     /// Full implementation in Phase 2; stub registered so the toolbar button compiles.
     /// </summary>
     [CommandStyle(Style.Hidden)]
-    public class SurroundMaterials : Command
+    public class DeltaCarbonMaterials : Command
     {
-        public override string EnglishName => "SurroundMaterials";
+        public override string EnglishName => "DeltaCarbonMaterials";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
@@ -22,7 +22,7 @@ namespace SurroundPlugin.Commands
             }
             catch (Exception ex)
             {
-                RhinoApp.WriteLine($"SURROUND: Material picker error: {ex.Message}");
+                RhinoApp.WriteLine($"DELTA CARBON: Material picker error: {ex.Message}");
             }
 
             return Result.Success;

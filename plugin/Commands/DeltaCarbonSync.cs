@@ -6,35 +6,35 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Rhino;
 using Rhino.Commands;
-using SurroundPlugin.Models;
+using DeltaCarbon.Models;
 
-namespace SurroundPlugin.Commands
+namespace DeltaCarbon.Commands
 {
     /// <summary>
-    /// "SurroundSync" — reads the plot selected in the web interface, then sends
+    /// "DeltaCarbonSync" — reads the plot selected in the web interface, then sends
     /// current Rhino geometry to that location. Run after selecting a plot in the browser.
     /// </summary>
-    public class SurroundSync : Command
+    public class DeltaCarbonSync : Command
     {
-        public override string EnglishName => "SurroundSync";
+        public override string EnglishName => "DeltaCarbonSync";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
             try { RunAsync(doc).GetAwaiter().GetResult(); }
-            catch (Exception ex) { RhinoApp.WriteLine($"SURROUND: Sync error: {ex.Message}"); }
+            catch (Exception ex) { RhinoApp.WriteLine($"DELTA CARBON: Sync error: {ex.Message}"); }
             return Result.Success;
         }
 
         private async Task RunAsync(RhinoDoc doc)
         {
-            RhinoApp.WriteLine("SURROUND: Syncing to web interface...");
+            RhinoApp.WriteLine("DELTA CARBON: Syncing to web interface...");
 
             var analyzer = new Core.GeometryAnalyzer();
             var buildingData = analyzer.Analyze(doc);
 
             if (buildingData == null || buildingData.Elements.Count == 0)
             {
-                RhinoApp.WriteLine("SURROUND: No Brep geometry found. " +
+                RhinoApp.WriteLine("DELTA CARBON: No Brep geometry found. " +
                                    "Add 3D objects to named layers (Structure, Envelope, etc.) and run again.");
                 return;
             }
@@ -44,19 +44,19 @@ namespace SurroundPlugin.Commands
             if (webPlot != null)
             {
                 buildingData.Location = webPlot;
-                RhinoApp.WriteLine($"SURROUND: Using plot selected in browser — {webPlot}");
+                RhinoApp.WriteLine($"DELTA CARBON: Using plot selected in browser — {webPlot}");
             }
             else if (buildingData.Location != null)
             {
-                RhinoApp.WriteLine($"SURROUND: No plot selected in browser — using Rhino EarthAnchorPoint {buildingData.Location}");
+                RhinoApp.WriteLine($"DELTA CARBON: No plot selected in browser — using Rhino EarthAnchorPoint {buildingData.Location}");
             }
             else
             {
                 buildingData.Location = new Location { Lat = 41.3997, Lon = 2.1888 };
-                RhinoApp.WriteLine("SURROUND: No plot selected and no EarthAnchorPoint — defaulting to Barcelona.");
+                RhinoApp.WriteLine("DELTA CARBON: No plot selected and no EarthAnchorPoint — defaulting to Barcelona.");
             }
 
-            RhinoApp.WriteLine($"SURROUND: {buildingData.Elements.Count} layer(s), " +
+            RhinoApp.WriteLine($"DELTA CARBON: {buildingData.Elements.Count} layer(s), " +
                                $"footprint {buildingData.Geometry.FootprintM2:F0} m², " +
                                $"height {buildingData.Geometry.HeightM:F0} m.");
 
@@ -64,20 +64,20 @@ namespace SurroundPlugin.Commands
             await ExportAndUploadObjAsync(doc).ConfigureAwait(false);
 
             // ── Step 3: send carbon estimate to web interface ─────────────────────
-            var apiClient = SurroundPlugin.Instance?.ApiClient;
+            var apiClient = DeltaCarbonPlugin.Instance?.ApiClient;
             if (apiClient == null)
             {
-                RhinoApp.WriteLine("SURROUND: Plugin not initialised — please reload.");
+                RhinoApp.WriteLine("DELTA CARBON: Plugin not initialised — please reload.");
                 return;
             }
 
             var estimate = await apiClient.GetCarbonEstimateAsync(buildingData).ConfigureAwait(false);
 
             if (estimate?.BaselineCarbon != null)
-                RhinoApp.WriteLine($"SURROUND: Synced — {estimate.BaselineCarbon.TotalTonnes:F0} t CO₂e " +
+                RhinoApp.WriteLine($"DELTA CARBON: Synced — {estimate.BaselineCarbon.TotalTonnes:F0} t CO₂e " +
                                    $"({estimate.BaselineCarbon.PerM2:F0} kg/m²). View at http://localhost:5173");
             else
-                RhinoApp.WriteLine("SURROUND: Sync failed — is the web interface running at http://localhost:5173?");
+                RhinoApp.WriteLine("DELTA CARBON: Sync failed — is the web interface running at http://localhost:5173?");
         }
 
         private static async Task ExportAndUploadObjAsync(RhinoDoc doc)
@@ -95,7 +95,7 @@ namespace SurroundPlugin.Commands
                 };
 
                 var sb = new StringBuilder();
-                sb.AppendLine("# SURROUND OBJ export");
+                sb.AppendLine("# DeltaCarbon OBJ export");
                 int vertexOffset = 1;
                 int faceCount = 0;
 
@@ -134,13 +134,13 @@ namespace SurroundPlugin.Commands
 
                 if (faceCount == 0)
                 {
-                    RhinoApp.WriteLine("SURROUND: No geometry to export.");
+                    RhinoApp.WriteLine("DELTA CARBON: No geometry to export.");
                     return;
                 }
 
                 string objText = sb.ToString();
                 File.WriteAllText(tmpPath, objText, Encoding.UTF8);
-                RhinoApp.WriteLine($"SURROUND: OBJ written ({objText.Length / 1024} KB, {faceCount} faces). Uploading...");
+                RhinoApp.WriteLine($"DELTA CARBON: OBJ written ({objText.Length / 1024} KB, {faceCount} faces). Uploading...");
 
                 using (var http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) })
                 using (var content = new StringContent(objText, Encoding.UTF8, "model/obj"))
@@ -148,14 +148,14 @@ namespace SurroundPlugin.Commands
                     var response = await http.PostAsync("http://localhost:5173/api/model/upload", content)
                                              .ConfigureAwait(false);
                     if (response.IsSuccessStatusCode)
-                        RhinoApp.WriteLine("SURROUND: OBJ uploaded to web viewer.");
+                        RhinoApp.WriteLine("DELTA CARBON: OBJ uploaded to web viewer.");
                     else
-                        RhinoApp.WriteLine($"SURROUND: Upload failed — {(int)response.StatusCode}.");
+                        RhinoApp.WriteLine($"DELTA CARBON: Upload failed — {(int)response.StatusCode}.");
                 }
             }
             catch (Exception ex)
             {
-                RhinoApp.WriteLine($"SURROUND: OBJ export error: {ex.Message}");
+                RhinoApp.WriteLine($"DELTA CARBON: OBJ export error: {ex.Message}");
             }
             finally
             {

@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Rhino;
-using SurroundPlugin.Models;
+using DeltaCarbon.Models;
 
-namespace SurroundPlugin.Core
+namespace DeltaCarbon.Core
 {
     /// <summary>
     /// HTTP client for the SURROUND cloud API.
@@ -40,7 +40,7 @@ namespace SurroundPlugin.Core
             if (!string.IsNullOrEmpty(apiKey))
                 _http.DefaultRequestHeaders.Add("X-API-Key", apiKey);
             else
-                RhinoApp.WriteLine("SURROUND: No API key found in Credential Manager. " +
+                RhinoApp.WriteLine("DELTA CARBON: No API key found in Credential Manager. " +
                                    "Add one with target name \"SurroundPlugin\".");
         }
 
@@ -53,7 +53,7 @@ namespace SurroundPlugin.Core
             if (buildingData == null) throw new ArgumentNullException(nameof(buildingData));
 
             string json = JsonConvert.SerializeObject(buildingData, Formatting.None);
-            RhinoApp.WriteLine($"SURROUND: POST {_http.BaseAddress}{EstimateEndpoint}");
+            RhinoApp.WriteLine($"DELTA CARBON: POST {_http.BaseAddress}{EstimateEndpoint}");
 
             for (int attempt = 1; attempt <= 2; attempt++)
             {
@@ -78,20 +78,20 @@ namespace SurroundPlugin.Core
                 }
                 catch (TaskCanceledException)
                 {
-                    RhinoApp.WriteLine($"SURROUND: Request timed out (attempt {attempt}/2).");
+                    RhinoApp.WriteLine($"DELTA CARBON: Request timed out (attempt {attempt}/2).");
                 }
                 catch (HttpRequestException ex)
                 {
-                    RhinoApp.WriteLine($"SURROUND: Network error (attempt {attempt}/2): {ex.Message}");
+                    RhinoApp.WriteLine($"DELTA CARBON: Network error (attempt {attempt}/2): {ex.Message}");
                 }
                 catch (Exception ex)
                 {
-                    RhinoApp.WriteLine($"SURROUND: Unexpected error: {ex.Message}");
+                    RhinoApp.WriteLine($"DELTA CARBON: Unexpected error: {ex.Message}");
                     return null; // non-retryable
                 }
             }
 
-            RhinoApp.WriteLine("SURROUND: Both API attempts failed. Check your connection.");
+            RhinoApp.WriteLine("DELTA CARBON: Both API attempts failed. Check your connection.");
             return null;
         }
 
@@ -146,7 +146,7 @@ namespace SurroundPlugin.Core
             }
             catch (Exception ex)
             {
-                RhinoApp.WriteLine($"SURROUND: Credential Manager error: {ex.Message}");
+                RhinoApp.WriteLine($"DELTA CARBON: Credential Manager error: {ex.Message}");
                 return string.Empty;
             }
         }

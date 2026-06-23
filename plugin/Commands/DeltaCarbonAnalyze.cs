@@ -3,18 +3,18 @@ using System.Threading.Tasks;
 using Rhino;
 using Rhino.Commands;
 using Rhino.Input.Custom;
-using SurroundPlugin.Models;
+using DeltaCarbon.Models;
 
-namespace SurroundPlugin.Commands
+namespace DeltaCarbon.Commands
 {
     /// <summary>
-    /// "SurroundAnalyze" — the main pipeline command.
+    /// "DeltaCarbonAnalyze" — the main pipeline command.
     /// Extracts geometry → calls API → updates the carbon panel.
     /// </summary>
     [CommandStyle(Style.Hidden)]
-    public class SurroundAnalyze : Command
+    public class DeltaCarbonAnalyze : Command
     {
-        public override string EnglishName => "SurroundAnalyze";
+        public override string EnglishName => "DeltaCarbonAnalyze";
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
@@ -25,7 +25,7 @@ namespace SurroundPlugin.Commands
             }
             catch (Exception ex)
             {
-                RhinoApp.WriteLine($"SURROUND: Unhandled error: {ex.Message}");
+                RhinoApp.WriteLine($"DELTA CARBON: Unhandled error: {ex.Message}");
             }
 
             return Result.Success;
@@ -33,12 +33,12 @@ namespace SurroundPlugin.Commands
 
         private async Task RunAsync(RhinoDoc doc)
         {
-            UI.CarbonPanel.Instance?.SetLoadingState(true);
+            RhinoApp.WriteLine("DELTA CARBON: Analysing model...");
 
             try
             {
                 // ── Step 1: extract geometry ──────────────────────────────────────
-                RhinoApp.WriteLine("SURROUND: Scanning model geometry...");
+                RhinoApp.WriteLine("DELTA CARBON: Scanning model geometry...");
                 var analyzer = new Core.GeometryAnalyzer();
                 var buildingData = analyzer.Analyze(doc);
 
@@ -46,39 +46,36 @@ namespace SurroundPlugin.Commands
                 {
                     const string msg = "No visible Brep geometry found. " +
                                        "Organise your massing as Breps on named layers and try again.";
-                    RhinoApp.WriteLine($"SURROUND: {msg}");
-                    UI.CarbonPanel.Instance?.SetErrorState(msg);
+                    RhinoApp.WriteLine($"DELTA CARBON: ERROR — {msg}");
                     return;
                 }
 
-                RhinoApp.WriteLine($"SURROUND: {buildingData.Elements.Count} layer(s) found. " +
+                RhinoApp.WriteLine($"DELTA CARBON: {buildingData.Elements.Count} layer(s) found. " +
                                    $"Footprint {buildingData.Geometry.FootprintM2:F0} m², " +
                                    $"height {buildingData.Geometry.HeightM:F0} m.");
 
                 // ── Step 2: location ──────────────────────────────────────────────
                 if (buildingData.Location == null)
                 {
-                    RhinoApp.WriteLine("SURROUND: No EarthAnchorPoint set. Enter coordinates manually.");
+                    RhinoApp.WriteLine("DELTA CARBON: No EarthAnchorPoint set. Enter coordinates manually.");
                     var location = PromptForLocation();
                     if (location == null)
                     {
-                        RhinoApp.WriteLine("SURROUND: Cancelled — no location provided.");
-                        UI.CarbonPanel.Instance?.SetLoadingState(false);
+                        RhinoApp.WriteLine("DELTA CARBON: Cancelled - no location provided.");
                         return;
                     }
                     buildingData.Location = location;
                 }
 
-                RhinoApp.WriteLine($"SURROUND: Location {buildingData.Location}");
-                RhinoApp.WriteLine("SURROUND: Sending geometry to carbon engine...");
+                RhinoApp.WriteLine($"DELTA CARBON: Location {buildingData.Location}");
+                RhinoApp.WriteLine("DELTA CARBON: Sending geometry to carbon engine...");
 
                 // ── Step 3: API call ──────────────────────────────────────────────
-                var apiClient = SurroundPlugin.Instance?.ApiClient;
+                var apiClient = DeltaCarbonPlugin.Instance?.ApiClient;
                 if (apiClient == null)
                 {
                     const string msg = "Plugin not fully initialised — please reload.";
-                    RhinoApp.WriteLine($"SURROUND: {msg}");
-                    UI.CarbonPanel.Instance?.SetErrorState(msg);
+                    RhinoApp.WriteLine($"DELTA CARBON: {msg}");
                     return;
                 }
 
@@ -91,25 +88,21 @@ namespace SurroundPlugin.Commands
                     RhinoApp.WriteLine(
                         $"SURROUND: {estimate.BaselineCarbon.TotalTonnes:F0} t CO₂e  " +
                         $"({estimate.BaselineCarbon.PerM2:F0} kg/m²)");
-                    UI.CarbonPanel.Instance?.UpdateEstimate(estimate, buildingData);
                 }
                 else
                 {
                     const string msg = "API did not return a valid estimate. " +
                                        "Check your API key (Credential Manager → \"SurroundPlugin\") " +
                                        "and network connection.";
-                    RhinoApp.WriteLine($"SURROUND: {msg}");
-                    UI.CarbonPanel.Instance?.SetErrorState(msg);
+                    RhinoApp.WriteLine($"DELTA CARBON: {msg}");
                 }
             }
             catch (Exception ex)
             {
-                RhinoApp.WriteLine($"SURROUND: Error in analysis: {ex.Message}");
-                UI.CarbonPanel.Instance?.SetErrorState($"Error: {ex.Message}");
+                RhinoApp.WriteLine($"DELTA CARBON: ERROR — {ex.Message}");
             }
             finally
             {
-                UI.CarbonPanel.Instance?.SetLoadingState(false);
             }
         }
 
@@ -136,7 +129,7 @@ namespace SurroundPlugin.Commands
             }
             catch (Exception ex)
             {
-                RhinoApp.WriteLine($"SURROUND: Location prompt error: {ex.Message}");
+                RhinoApp.WriteLine($"DELTA CARBON: Location prompt error: {ex.Message}");
                 return null;
             }
         }

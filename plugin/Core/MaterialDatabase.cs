@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SurroundPlugin.Models;
+using DeltaCarbon.Models;
 
 // Carbon coefficients source: BEDEC/ITeC (Institut de Tecnologia de la Construcció de Catalunya)
 // Values: kg CO₂e/m³ at A1–A3. Retrieved via 2050-materials API, country="ES".
 // Last aligned: June 2026
 
-namespace SurroundPlugin.Core
+namespace DeltaCarbon.Core
 {
     /// <summary>
     /// In-memory EPD material database. Coefficients from BEDEC/ITeC, country="ES".
