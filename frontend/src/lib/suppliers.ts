@@ -1,4 +1,4 @@
-export interface Supplier {
+export interface Manufacturer {
   id: string;
   name: string;
   material: string;
@@ -10,7 +10,7 @@ export interface Supplier {
   regions: string[];
 }
 
-export const SUPPLIERS: Supplier[] = [
+export const MANUFACTURERS: Manufacturer[] = [
   // CLT / Timber strutturale
   { id: "egoin", name: "Egoin", material: "CLT / Cross-laminated timber", materialId: "clt-glulam", location: "Zamudio, Spain", coords: { lat: 43.2969, lng: -2.8716 }, website: "https://egoin.com", co2PerKm: 0.062, regions: ["ES", "EU"] },
   { id: "arboreal", name: "Arboreal", material: "CLT / Cross-laminated timber", materialId: "clt-glulam", location: "Galicia, Spain", coords: { lat: 42.8782, lng: -8.5448 }, website: "https://arboreal.es", co2PerKm: 0.062, regions: ["ES"] },
