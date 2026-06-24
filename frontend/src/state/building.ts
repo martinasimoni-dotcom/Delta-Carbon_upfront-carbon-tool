@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { getMaterial } from "@/lib/materials";
+import { captureViewerScreenshot } from "@/lib/viewer-screenshot";
 
 export type ElementKind = "foundation" | "structure" | "envelope" | "floors" | "roof";
 
@@ -25,6 +26,7 @@ export interface ProjectOption {
   supplierName: string | null;
   totalCo2Kg: number;
   renderUrl: string | null;
+  screenshotB64: string | null;
 }
 
 export interface Project {
@@ -305,6 +307,7 @@ export const useBuilding = create<State>()(
           supplierName,
           totalCo2Kg,
           renderUrl: null,
+          screenshotB64: captureViewerScreenshot(),
         };
         set({
           projects: projects.map((p) =>

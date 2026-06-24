@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -36,6 +36,7 @@ function RenderPanel({ option, buildingUse, location }: {
   const setOptionRender = useBuilding((s) => s.setOptionRender);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const triggered = useRef(false);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -50,6 +51,9 @@ function RenderPanel({ option, buildingUse, location }: {
           location,
           elements: option.elements.map((e) => ({ type: e.kind, material: getMaterial(e.materialId).name })),
           total_co2_kg: option.totalCo2Kg,
+          screenshot_b64: option.screenshotB64
+            ? option.screenshotB64.replace(/^data:[^;]+;base64,/, "")
+            : null,
         }),
       });
       if (!res.ok) {
@@ -65,6 +69,14 @@ function RenderPanel({ option, buildingUse, location }: {
     }
   };
 
+  useEffect(() => {
+    if (!option.renderUrl && !triggered.current) {
+      triggered.current = true;
+      handleGenerate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div className="border border-[#E5E7EB] rounded-lg overflow-hidden bg-white flex flex-col">
       <div className="relative bg-[#F5F5F5] aspect-video flex items-center justify-center">
@@ -79,24 +91,10 @@ function RenderPanel({ option, buildingUse, location }: {
               {generating ? "…" : "Regenerate"}
             </button>
           </>
-        ) : generating ? (
+        ) : (
           <div className="flex flex-col items-center gap-2 text-center px-4">
             <div className="w-6 h-6 border-2 border-[#1a4731] border-t-transparent rounded-full animate-spin" />
-            <p className="text-[11px] text-muted-foreground">Generating architectural render with DALL-E 3…</p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="1" />
-              <path d="M9 22V12h6v10" /><path d="M3 9h18" />
-            </svg>
-            <button
-              onClick={handleGenerate}
-              className="text-[11px] font-semibold uppercase tracking-wider text-white px-4 py-2 rounded-sm hover:opacity-90 transition-opacity"
-              style={{ backgroundColor: "#1a4731" }}
-            >
-              Generate render
-            </button>
+            <p className="text-[11px] text-muted-foreground">Generating architectural render…</p>
           </div>
         )}
       </div>

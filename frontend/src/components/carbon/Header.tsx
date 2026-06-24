@@ -28,8 +28,9 @@ export function Header() {
   return (
     <header className="h-[60px] border-b border-border bg-background flex items-center justify-between px-6">
       <div className="flex items-baseline gap-2">
-        <Link to="/dashboard" className="text-sm font-semibold tracking-[0.15em] uppercase text-foreground hover:opacity-70 transition-opacity">
-          Delta Carbon
+        <Link to="/dashboard" className="flex items-center gap-3 hover:opacity-70 transition-opacity">
+          <img src="/logo.svg" alt="Delta Carbon" className="h-10 w-10" />
+          <span className="text-base font-semibold tracking-[0.15em] uppercase text-foreground">DELTA CARBON</span>
         </Link>
         {currentProject && (
           <>

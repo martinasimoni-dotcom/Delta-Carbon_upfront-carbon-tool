@@ -26,17 +26,9 @@ function LoginPage() {
       <div className="w-full max-w-[320px] flex flex-col items-center gap-8">
         {/* Logo + wordmark */}
         <div className="flex flex-col items-center gap-3">
-          <div
-            className="w-12 h-12 rounded-lg flex items-center justify-center"
-            style={{ backgroundColor: "#1a4731" }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-              <polyline points="9 22 9 12 15 12 15 22" />
-            </svg>
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight" style={{ color: "#111111" }}>
-            Delta Carbon
+          <img src="/logo.svg" alt="Delta Carbon" className="w-24 h-24" />
+          <h1 className="text-2xl font-bold tracking-[0.15em] uppercase" style={{ color: "#111111" }}>
+            DELTA CARBON
           </h1>
           <p className="text-sm text-center leading-relaxed" style={{ color: "#6B7280" }}>
             Upfront carbon assessment.<br />First hour of design.

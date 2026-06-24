@@ -110,6 +110,7 @@ class RenderRequest(BaseModel):
     location: str = "Barcelona, Spain"
     elements: list[RenderElementIn]
     total_co2_kg: float
+    screenshot_b64: str | None = None
 
 # ── Rashi geometry fallback ───────────────────────────────────────────────────
 
@@ -375,13 +376,46 @@ def render(req: RenderRequest):
         f"No people, no text, no watermarks."
     )
 
-    response = client.images.generate(
-        model="dall-e-3",
-        prompt=prompt,
-        size="1792x1024",
-        quality="standard",
-        n=1,
-    )
+    if req.screenshot_b64:
+        import base64
+        from io import BytesIO
+        image_bytes = base64.b64decode(req.screenshot_b64)
+        image_file = BytesIO(image_bytes)
+        image_file.name = "massing.jpg"
+        edit_prompt = (
+            f"Transform this architectural massing model into a photorealistic exterior render of a {req.building_use.lower()} building in {req.location}. "
+            f"Materials: {materials_desc}. "
+            f"Keep the exact building geometry, proportions, and massing from the reference image. "
+            f"Apply professional architectural visualization: natural daylight, clean contemporary background. "
+            f"{timber_note}"
+            f"{regen_note}"
+            f"No people, no text, no watermarks."
+        )
+        try:
+            response = client.images.edit(
+                model="gpt-image-1",
+                image=image_file,
+                prompt=edit_prompt,
+                size="1536x1024",
+                quality="medium",
+            )
+        except Exception:
+            response = client.images.generate(
+                model="gpt-image-1",
+                prompt=prompt,
+                size="1536x1024",
+                quality="medium",
+                n=1,
+            )
+    else:
+        response = client.images.generate(
+            model="gpt-image-1",
+            prompt=prompt,
+            size="1536x1024",
+            quality="medium",
+            n=1,
+        )
 
-    image_url = response.data[0].url
+    b64 = response.data[0].b64_json
+    image_url = f"data:image/png;base64,{b64}"
     return {"image_url": image_url, "prompt_used": prompt}

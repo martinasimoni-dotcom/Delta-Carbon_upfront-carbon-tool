@@ -265,6 +265,41 @@ function rhinoBridge(): Plugin {
         },
       );
 
+      // /v1/render — proxy to FastAPI (DALL-E 3; no local fallback)
+      server.middlewares.use(
+        "/v1/render",
+        (req: IncomingMessage, res: ServerResponse, next: () => void) => {
+          const headers = {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+          };
+          if (req.method === "OPTIONS") { res.writeHead(204, headers); res.end(); return; }
+          if (req.method === "POST") {
+            let body = "";
+            req.on("data", (chunk: Buffer) => { body += chunk.toString(); });
+            req.on("end", async () => {
+              try {
+                const backendRes = await fetch("http://localhost:8000/v1/render", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body,
+                });
+                const data = await backendRes.json();
+                res.writeHead(backendRes.ok ? 200 : backendRes.status, headers);
+                res.end(JSON.stringify(data));
+              } catch {
+                res.writeHead(503, headers);
+                res.end(JSON.stringify({ error: "backend_unavailable" }));
+              }
+            });
+            return;
+          }
+          next();
+        },
+      );
+
       // /v1/suggestions — proxy to FastAPI (no local fallback; LLM call required)
       server.middlewares.use(
         "/v1/suggestions",

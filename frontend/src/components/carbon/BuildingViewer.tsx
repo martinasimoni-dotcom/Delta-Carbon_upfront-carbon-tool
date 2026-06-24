@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { useBuilding } from "@/state/building";
+import { registerCapture } from "@/lib/viewer-screenshot";
 
 export function BuildingViewer() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -53,6 +54,18 @@ export function BuildingViewer() {
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
     cameraRef.current = camera;
+
+    registerCapture(() => {
+      renderer.render(scene, camera);
+      const canvas = renderer.domElement;
+      const scale = Math.min(1, 1024 / canvas.width);
+      if (scale >= 1) return canvas.toDataURL("image/jpeg", 0.85);
+      const tmp = document.createElement("canvas");
+      tmp.width = Math.round(canvas.width * scale);
+      tmp.height = Math.round(canvas.height * scale);
+      tmp.getContext("2d")!.drawImage(canvas, 0, 0, tmp.width, tmp.height);
+      return tmp.toDataURL("image/jpeg", 0.85);
+    });
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.6));
 
@@ -182,6 +195,7 @@ export function BuildingViewer() {
     animate();
 
     return () => {
+      registerCapture(() => null);
       loadModelRef.current = null;
       sceneRef.current = null;
       cameraRef.current = null;

@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useNavigate, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -42,14 +42,16 @@ function elementCO2forOption(opt: ProjectOption, kind: string): number {
 
 // ── Render panel ──────────────────────────────────────────────────────────────
 
-function RenderPanel({ option, buildingUse, location }: {
+function RenderPanel({ option, buildingUse, location, onDelete }: {
   option: ProjectOption;
   buildingUse: string;
   location: string;
+  onDelete: () => void;
 }) {
   const setOptionRender = useBuilding((s) => s.setOptionRender);
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const triggered = useRef(false);
 
   const handleGenerate = async () => {
     setGenerating(true);
@@ -67,6 +69,9 @@ function RenderPanel({ option, buildingUse, location }: {
             material: getMaterial(e.materialId).name,
           })),
           total_co2_kg: option.totalCo2Kg,
+          screenshot_b64: option.screenshotB64
+            ? option.screenshotB64.replace(/^data:[^;]+;base64,/, "")
+            : null,
         }),
       });
       if (!res.ok) {
@@ -81,6 +86,14 @@ function RenderPanel({ option, buildingUse, location }: {
       setGenerating(false);
     }
   };
+
+  useEffect(() => {
+    if (!option.renderUrl && !triggered.current) {
+      triggered.current = true;
+      handleGenerate();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="border border-[#E5E7EB] rounded-lg overflow-hidden bg-white flex flex-col">
@@ -122,14 +135,25 @@ function RenderPanel({ option, buildingUse, location }: {
         <p className="text-[10px] text-[#EF4444] px-3 pt-2">{error}</p>
       )}
       {/* Label */}
-      <div className="p-3">
-        <p className="text-sm font-semibold text-foreground">{option.name}</p>
-        <p
-          className="text-xs font-medium tabular-nums"
-          style={{ color: option.totalCo2Kg < 0 ? "#1a4731" : "#EF4444" }}
+      <div className="flex items-start justify-between gap-2 p-3">
+        <div>
+          <p className="text-sm font-semibold text-foreground">{option.name}</p>
+          <p
+            className="text-xs font-medium tabular-nums"
+            style={{ color: option.totalCo2Kg < 0 ? "#1a4731" : "#EF4444" }}
+          >
+            {formatCO2(option.totalCo2Kg)}
+          </p>
+        </div>
+        <button
+          onClick={() => { if (window.confirm(`Delete "${option.name}"?`)) onDelete(); }}
+          className="shrink-0 p-1 text-[#9CA3AF] hover:text-[#EF4444] hover:bg-[#FEE2E2] rounded transition-colors"
+          title="Delete option"
         >
-          {formatCO2(option.totalCo2Kg)}
-        </p>
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6" /><path d="M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+          </svg>
+        </button>
       </div>
     </div>
   );
@@ -141,11 +165,19 @@ function ComparePage() {
   const navigate = useNavigate();
   const projects = useBuilding((s) => s.projects);
   const currentProjectId = useBuilding((s) => s.currentProjectId);
+  const deleteOption = useBuilding((s) => s.deleteOption);
 
   const project = projects.find((p) => p.id === currentProjectId);
   const options: ProjectOption[] = project?.options ?? [];
 
   const [downloading, setDownloading] = useState(false);
+
+  // Navigate back to workspace if fewer than 2 options remain after deletion
+  const handleDelete = (optionId: string) => {
+    deleteOption(optionId);
+    const remaining = options.filter((o) => o.id !== optionId);
+    if (remaining.length < 2) navigate({ to: "/" });
+  };
 
   const minCo2 = Math.min(...options.map((o) => o.totalCo2Kg));
   const baseline = options[0]?.totalCo2Kg ?? 0;
@@ -213,6 +245,7 @@ function ComparePage() {
                   option={opt}
                   buildingUse={project?.buildingUse ?? "Office"}
                   location={project?.location ?? "Barcelona, Spain"}
+                  onDelete={() => handleDelete(opt.id)}
                 />
                 <div className="flex gap-1.5 flex-wrap">
                   {opt.totalCo2Kg < 0 && (
