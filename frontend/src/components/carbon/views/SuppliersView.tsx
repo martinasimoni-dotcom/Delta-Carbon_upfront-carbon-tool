@@ -359,6 +359,9 @@ export function SuppliersView() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6B7280] mb-1.5">
             Step 2 — Select manufacturer (Point B)
           </p>
+          <p className="text-[11px] text-[#9CA3AF] mb-2">
+            Manufacturers are sorted from closest to farthest from your project location.
+          </p>
           <select
             value={selectedManufacturerId}
             onChange={(e) => {

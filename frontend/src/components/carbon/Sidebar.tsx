@@ -109,8 +109,7 @@ const sections = [
   { id: "elements",  n: "03", title: "Building Elements",          body: <ElementsSection /> },
   { id: "results",   n: "04", title: "CO₂ Results",               body: <ResultsSection /> },
   { id: "optimize",  n: "05", title: "Material Suggestions",       body: <MaterialSuggestionsSection /> },
-  { id: "suppliers", n: "07", title: "Suppliers",                  body: <SuppliersSection /> },
-  { id: "options",   n: "08", title: "Options",                    body: <OptionsSection /> },
+  { id: "options",   n: "06", title: "Options",                    body: <OptionsSection /> },
 ];
 
 export function Sidebar() {

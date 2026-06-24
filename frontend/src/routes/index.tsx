@@ -73,7 +73,7 @@ function usePlotBroadcast() {
 
 const TABS = [
   { id: "model", label: "3D Model" },
-  { id: "suppliers", label: "Suppliers" },
+  { id: "suppliers", label: "Manufacturers" },
   { id: "compare", label: "Compare" },
   { id: "research", label: "Research" },
 ] as const;
