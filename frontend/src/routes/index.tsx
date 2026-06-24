@@ -8,6 +8,7 @@ import { CreateProjectModal } from "@/components/carbon/CreateProjectModal";
 import { ImportOBJButton } from "@/components/carbon/ImportOBJButton";
 import { SuppliersView } from "@/components/carbon/views/SuppliersView";
 import { CompareView } from "@/components/carbon/views/CompareView";
+import { ResearchView } from "@/components/carbon/views/ResearchView";
 import { useBuilding } from "@/state/building";
 
 export const Route = createFileRoute("/")({
@@ -74,6 +75,7 @@ const TABS = [
   { id: "model", label: "3D Model" },
   { id: "suppliers", label: "Suppliers" },
   { id: "compare", label: "Compare" },
+  { id: "research", label: "Research" },
 ] as const;
 
 type Tab = (typeof TABS)[number]["id"];
@@ -129,6 +131,12 @@ function Index() {
       {activeTab === "compare" && (
         <div className="flex-1 min-h-0 bg-[#FAFAFA]">
           <CompareView />
+        </div>
+      )}
+
+      {activeTab === "research" && (
+        <div className="flex-1 min-h-0">
+          <ResearchView />
         </div>
       )}
 

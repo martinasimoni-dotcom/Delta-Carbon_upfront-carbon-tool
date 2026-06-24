@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import { useBuilding } from "@/state/building";
 import { getMaterial } from "@/lib/materials";
-import { SUPPLIERS, type Supplier } from "@/lib/suppliers";
+import { MANUFACTURERS, type Manufacturer } from "@/lib/suppliers";
 
 const TRANSPORT_FACTOR = 0.062;
 
@@ -27,22 +27,89 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function decodePolyline(encoded: string): [number, number][] {
+  const coords: [number, number][] = [];
+  let index = 0, lat = 0, lng = 0;
+  while (index < encoded.length) {
+    let shift = 0, result = 0, byte: number;
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+    shift = 0; result = 0;
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+    coords.push([lng / 1e5, lat / 1e5]);
+  }
+  return coords;
+}
+
+async function getRoute(
+  originLat: number, originLng: number,
+  destLat: number, destLng: number,
+  apiKey: string
+): Promise<{ distanceKm: number; polyline: string } | null> {
+  try {
+    const response = await fetch("https://routes.googleapis.com/directions/v2:computeRoutes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": "routes.distanceMeters,routes.polyline.encodedPolyline",
+      },
+      body: JSON.stringify({
+        origin: { location: { latLng: { latitude: originLat, longitude: originLng } } },
+        destination: { location: { latLng: { latitude: destLat, longitude: destLng } } },
+        travelMode: "DRIVE",
+        routingPreference: "TRAFFIC_UNAWARE",
+      }),
+    });
+    const data = await response.json();
+    if (!data.routes || data.routes.length === 0) return null;
+    const route = data.routes[0];
+    return {
+      distanceKm: route.distanceMeters / 1000,
+      polyline: route.polyline.encodedPolyline,
+    };
+  } catch {
+    return null;
+  }
+}
+
+type RouteResult = {
+  distanceKm: number;
+  co2Kg: number;
+  weightTonnes: number;
+  materialName: string;
+  volumeM3: number;
+  usedFallback: boolean;
+  routeCoords: [number, number][] | null;
+};
+
 export function SuppliersView() {
-  // Use searchLocation (real geographic location from Google Maps) — NOT plotCenter
-  // plotCenter can carry invalid Rhino EarthAnchorPoint values like -1.234e+308
   const searchLocation = useBuilding((s) => s.searchLocation);
   const elements = useBuilding((s) => s.elements);
   const setTransportCo2Kg = useBuilding((s) => s.setTransportCo2Kg);
   const setSupplierName = useBuilding((s) => s.setSupplierName);
   const updateCurrentProject = useBuilding((s) => s.updateCurrentProject);
 
-  const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
-  const [results, setResults] = useState<Record<string, { km: number; co2Kg: number }>>({});
+  const [selectedManufacturerId, setSelectedManufacturerId] = useState<string>("");
+  const [calculating, setCalculating] = useState(false);
+  const [result, setResult] = useState<RouteResult | null>(null);
+  const [saved, setSaved] = useState(false);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<mapboxgl.Marker[]>([]);
 
-  // Derive validated project coordinates from searchLocation only
   const rawLat = searchLocation?.lat ?? NaN;
   const rawLng = searchLocation?.lon ?? NaN;
   const projectCoords =
@@ -59,81 +126,93 @@ export function SuppliersView() {
     locationName.toLowerCase().includes("valencia") ||
     locationName.toLowerCase().includes("sevilla");
 
-  const relevantSuppliers = SUPPLIERS.filter((s) =>
-    isSpain ? s.regions.includes("ES") : s.regions.includes("EU")
+  const relevantManufacturers = MANUFACTURERS.filter((m) =>
+    isSpain ? m.regions.includes("ES") : m.regions.includes("EU")
   );
 
-  const handleCalculate = (supplier: Supplier) => {
-    if (!projectCoords) return;
-    const km = Math.round(
-      haversineKm(projectCoords.lat, projectCoords.lng, supplier.coords.lat, supplier.coords.lng)
-    );
-    const heaviest = [...elements].sort((a, b) => b.volumeM3 - a.volumeM3)[0];
-    const mat = getMaterial(heaviest.materialId);
-    const weightTonnes = (heaviest.volumeM3 * mat.density) / 1000;
-    const co2Kg = Math.round(km * weightTonnes * TRANSPORT_FACTOR);
-    setResults((prev) => ({ ...prev, [supplier.id]: { km, co2Kg } }));
-    setSelectedSupplierId(supplier.id);
-    setTransportCo2Kg(co2Kg);
-    setSupplierName(supplier.name);
-    updateCurrentProject();
-  };
+  const sortedManufacturers = useMemo(() => {
+    if (!projectCoords) return relevantManufacturers;
+    return [...relevantManufacturers].sort((a, b) => {
+      const distA = haversineKm(projectCoords.lat, projectCoords.lng, a.coords.lat, a.coords.lng);
+      const distB = haversineKm(projectCoords.lat, projectCoords.lng, b.coords.lat, b.coords.lng);
+      return distA - distB;
+    });
+  }, [relevantManufacturers, projectCoords]);
 
-  // Mapbox — depends on projectCoords and selectedSupplierId only
+  const selectedManufacturer: Manufacturer | null =
+    sortedManufacturers.find((m) => m.id === selectedManufacturerId) ?? null;
+
+  // Init map once
   useEffect(() => {
     const mbToken = import.meta.env.VITE_MAPBOX_TOKEN as string | undefined;
     if (!mbToken || !mapContainerRef.current) return;
-
-    // Destroy any previous map to avoid WebGL context leaks
-    if (mapRef.current) { mapRef.current.remove(); mapRef.current = null; }
+    if (mapRef.current) return;
 
     mapboxgl.accessToken = mbToken;
     const center: [number, number] = projectCoords
       ? [projectCoords.lng, projectCoords.lat]
-      : [2.1734, 41.3851]; // fallback: Barcelona
+      : [2.1734, 41.3851];
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/light-v11",
       center,
-      zoom: 4,
-      interactive: false,
+      zoom: 5,
+      interactive: true,
     });
     mapRef.current = map;
 
-    map.on("load", () => {
-      // Project pin — only when coordinates are valid
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update pins and route whenever result or selection changes
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    const update = () => {
+      markersRef.current.forEach((m) => m.remove());
+      markersRef.current = [];
+
+      if (map.getLayer("route")) map.removeLayer("route");
+      if (map.getSource("route")) map.removeSource("route");
+
+      // Green dot — project location (Point A)
       if (projectCoords && isValidCoord(projectCoords.lat, projectCoords.lng)) {
-        new mapboxgl.Marker({ color: "#1a4731" })
+        const el = document.createElement("div");
+        el.style.cssText =
+          "width:14px;height:14px;border-radius:50%;background:#1a4731;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)";
+        const m = new mapboxgl.Marker({ element: el })
           .setLngLat([projectCoords.lng, projectCoords.lat])
-          .setPopup(new mapboxgl.Popup().setText("Project"))
+          .setPopup(new mapboxgl.Popup({ offset: 10 }).setText("Project location"))
           .addTo(map);
+        markersRef.current.push(m);
       }
 
-      // Supplier pins
-      relevantSuppliers.forEach((s) => {
-        const isSelected = s.id === selectedSupplierId;
-        new mapboxgl.Marker({ color: isSelected ? "#1a4731" : "#9CA3AF" })
-          .setLngLat([s.coords.lng, s.coords.lat])
-          .setPopup(new mapboxgl.Popup().setText(s.name))
+      // Red dot — selected manufacturer (Point B)
+      if (selectedManufacturer) {
+        const el = document.createElement("div");
+        el.style.cssText =
+          "width:14px;height:14px;border-radius:50%;background:#dc2626;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3)";
+        const m = new mapboxgl.Marker({ element: el })
+          .setLngLat([selectedManufacturer.coords.lng, selectedManufacturer.coords.lat])
+          .setPopup(new mapboxgl.Popup({ offset: 10 }).setText(selectedManufacturer.name))
           .addTo(map);
-      });
+        markersRef.current.push(m);
+      }
 
-      // Dashed route line to selected supplier
-      const selected = relevantSuppliers.find((s) => s.id === selectedSupplierId);
-      if (selected && projectCoords && isValidCoord(projectCoords.lat, projectCoords.lng)) {
+      // Route polyline
+      if (result?.routeCoords && result.routeCoords.length > 1) {
         map.addSource("route", {
           type: "geojson",
           data: {
             type: "Feature",
             properties: {},
-            geometry: {
-              type: "LineString",
-              coordinates: [
-                [projectCoords.lng, projectCoords.lat],
-                [selected.coords.lng, selected.coords.lat],
-              ],
-            },
+            geometry: { type: "LineString", coordinates: result.routeCoords },
           },
         });
         map.addLayer({
@@ -141,80 +220,225 @@ export function SuppliersView() {
           type: "line",
           source: "route",
           layout: { "line-join": "round", "line-cap": "round" },
-          paint: { "line-color": "#1a4731", "line-width": 2, "line-dasharray": [2, 2] },
+          paint: { "line-color": "#1a4731", "line-width": 3, "line-opacity": 0.8 },
         });
-      }
-    });
 
-    return () => {
-      map.remove(); // releases WebGL context
-      mapRef.current = null;
+        const lngs = result.routeCoords.map((c) => c[0]);
+        const lats = result.routeCoords.map((c) => c[1]);
+        map.fitBounds(
+          [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+          { padding: 60, duration: 800 }
+        );
+      } else if (projectCoords && selectedManufacturer) {
+        map.fitBounds(
+          [
+            [
+              Math.min(projectCoords.lng, selectedManufacturer.coords.lng),
+              Math.min(projectCoords.lat, selectedManufacturer.coords.lat),
+            ],
+            [
+              Math.max(projectCoords.lng, selectedManufacturer.coords.lng),
+              Math.max(projectCoords.lat, selectedManufacturer.coords.lat),
+            ],
+          ],
+          { padding: 80, duration: 800 }
+        );
+      }
     };
-  }, [selectedSupplierId, projectCoords?.lat, projectCoords?.lng, relevantSuppliers.length]);
+
+    if (map.isStyleLoaded()) {
+      update();
+    } else {
+      map.once("load", update);
+    }
+  }, [result, selectedManufacturer, projectCoords]);
+
+  const handleCalculate = async () => {
+    if (!projectCoords || !selectedManufacturer) return;
+    setCalculating(true);
+    setSaved(false);
+    setResult(null);
+
+    const matchingEl = elements.find((e) => e.materialId === selectedManufacturer.materialId);
+    const targetEl = matchingEl ?? [...elements].sort((a, b) => b.volumeM3 - a.volumeM3)[0];
+    const mat = getMaterial(targetEl.materialId);
+    const weightTonnes = (targetEl.volumeM3 * mat.density) / 1000;
+
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
+    let distanceKm: number;
+    let routeCoords: [number, number][] | null = null;
+    let usedFallback = false;
+
+    if (apiKey) {
+      const routeData = await getRoute(
+        projectCoords.lat, projectCoords.lng,
+        selectedManufacturer.coords.lat, selectedManufacturer.coords.lng,
+        apiKey
+      );
+      if (routeData) {
+        distanceKm = routeData.distanceKm;
+        routeCoords = decodePolyline(routeData.polyline);
+      } else {
+        distanceKm = haversineKm(
+          projectCoords.lat, projectCoords.lng,
+          selectedManufacturer.coords.lat, selectedManufacturer.coords.lng
+        );
+        usedFallback = true;
+      }
+    } else {
+      distanceKm = haversineKm(
+        projectCoords.lat, projectCoords.lng,
+        selectedManufacturer.coords.lat, selectedManufacturer.coords.lng
+      );
+      usedFallback = true;
+    }
+
+    const co2Kg = Math.round(distanceKm * weightTonnes * TRANSPORT_FACTOR);
+
+    setResult({
+      distanceKm: Math.round(distanceKm),
+      co2Kg,
+      weightTonnes: Math.round(weightTonnes * 10) / 10,
+      materialName: mat.name,
+      volumeM3: Math.round(targetEl.volumeM3),
+      usedFallback,
+      routeCoords,
+    });
+    setCalculating(false);
+  };
+
+  const handleSave = () => {
+    if (!result || !selectedManufacturer) return;
+    setTransportCo2Kg(result.co2Kg);
+    setSupplierName(selectedManufacturer.name);
+    updateCurrentProject();
+    setSaved(true);
+  };
 
   return (
     <div className="flex h-full min-h-0">
-      {/* Left: supplier list */}
-      <div className="w-[40%] border-r border-[#E5E7EB] overflow-y-auto p-6 space-y-3">
-        <h2 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6B7280] mb-4">
-          Recommended suppliers · {isSpain ? "Spain" : "Europe"}
-        </h2>
-        {!projectCoords && (
-          <p className="text-[11px] text-[#EAB308]">
-            Set a site location first (section 01 SITE) to enable A4 calculations.
-          </p>
-        )}
-        {relevantSuppliers.map((supplier) => {
-          const res = results[supplier.id];
-          const isSelected = supplier.id === selectedSupplierId;
-          return (
-            <div
-              key={supplier.id}
-              className={`border rounded-sm p-3 space-y-1.5 transition-colors ${isSelected ? "border-[#1a4731] bg-[#F0FDF4]" : "border-[#E5E7EB] bg-white"}`}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <p className="text-xs font-semibold text-foreground">{supplier.name}</p>
-                  <p className="text-[10px] text-[#6B7280]">{supplier.material}</p>
-                  <p className="text-[10px] text-[#9CA3AF]">{supplier.location}</p>
-                </div>
-                <a
-                  href={supplier.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#6B7280] hover:text-[#1a4731] shrink-0 mt-0.5"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                    <polyline points="15 3 21 3 21 9" />
-                    <line x1="10" y1="14" x2="21" y2="3" />
-                  </svg>
-                </a>
-              </div>
-              <button
-                onClick={() => handleCalculate(supplier)}
-                disabled={!projectCoords}
-                className="text-[10px] font-medium uppercase tracking-wider text-white px-2.5 py-1 rounded-sm hover:opacity-90 disabled:opacity-40 transition-opacity"
-                style={{ backgroundColor: "#1a4731" }}
-              >
-                Calculate A4 →
-              </button>
-              {res && (
-                <p className="text-[10px] text-[#1a4731] font-medium tabular-nums">
-                  {res.km.toLocaleString()} km · +{res.co2Kg.toLocaleString()} kg CO₂ A4
-                </p>
-              )}
-            </div>
-          );
-        })}
-      </div>
 
-      {/* Right: map */}
-      <div className="flex-1 relative">
+      {/* Left — map (70%) */}
+      <div className="relative" style={{ width: "70%" }}>
         <div ref={mapContainerRef} className="absolute inset-0" />
         {!import.meta.env.VITE_MAPBOX_TOKEN && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#F9FAFB]">
             <p className="text-[11px] text-[#9CA3AF]">Set VITE_MAPBOX_TOKEN to show map</p>
+          </div>
+        )}
+      </div>
+
+      {/* Right — steps (30%) */}
+      <div
+        className="border-l border-[#E5E7EB] overflow-y-auto p-5 space-y-5 flex-shrink-0"
+        style={{ width: "30%" }}
+      >
+
+        {/* Step 1 — Project location */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6B7280] mb-1.5">
+            Step 1 — Project location (Point A)
+          </p>
+          <div className="flex items-center gap-2 border border-[#E5E7EB] rounded-sm px-3 py-2.5 bg-white">
+            <div className="w-2.5 h-2.5 rounded-full bg-[#1a4731] shrink-0" />
+            <span className="text-xs text-foreground truncate">
+              {projectCoords
+                ? locationName || "Location set"
+                : "No location — go to Site tab"}
+            </span>
+          </div>
+          {!projectCoords && (
+            <p className="text-[10px] text-[#EAB308] mt-1">
+              Set a site location in the Site tab to enable A4 calculations.
+            </p>
+          )}
+        </div>
+
+        {/* Step 2 — Select manufacturer */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6B7280] mb-1.5">
+            Step 2 — Select manufacturer (Point B)
+          </p>
+          <select
+            value={selectedManufacturerId}
+            onChange={(e) => {
+              setSelectedManufacturerId(e.target.value);
+              setResult(null);
+              setSaved(false);
+            }}
+            className="w-full border border-[#E5E7EB] rounded-sm px-3 py-2.5 text-xs bg-white text-foreground focus:outline-none focus:border-[#1a4731]"
+          >
+            <option value="">Select a manufacturer…</option>
+            {sortedManufacturers.map((m) => {
+              const approxKm = projectCoords
+                ? Math.round(haversineKm(projectCoords.lat, projectCoords.lng, m.coords.lat, m.coords.lng))
+                : null;
+              return (
+                <option key={m.id} value={m.id}>
+                  {m.name} — {m.material} — {m.location}
+                  {approxKm !== null ? ` (~${approxKm.toLocaleString()} km)` : ""}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+
+        {/* Step 3 — Calculate */}
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-[#6B7280] mb-1.5">
+            Step 3 — Calculate route
+          </p>
+          <button
+            onClick={handleCalculate}
+            disabled={!projectCoords || !selectedManufacturerId || calculating}
+            className="w-full py-2.5 text-xs font-semibold uppercase tracking-wider text-white rounded-sm disabled:opacity-40 transition-opacity hover:opacity-90"
+            style={{ backgroundColor: "#1a4731" }}
+          >
+            {calculating ? "Calculating…" : "Calculate Route →"}
+          </button>
+        </div>
+
+        {/* Results */}
+        {result && selectedManufacturer && (
+          <div className="border border-[#E5E7EB] rounded-sm bg-white divide-y divide-[#F3F4F6]">
+            {result.usedFallback && (
+              <div className="px-3 py-2 bg-[#FFFBEB]">
+                <p className="text-[10px] text-[#92400E]">
+                  Road route not available — using straight-line distance
+                </p>
+              </div>
+            )}
+            <div className="px-3 py-3 space-y-2.5">
+              {[
+                ["MANUFACTURER", selectedManufacturer.name + ", " + selectedManufacturer.location],
+                ["DISTANCE", result.distanceKm.toLocaleString() + " km" + (result.usedFallback ? " (straight line)" : " (road)")],
+                ["MATERIAL", result.materialName],
+                ["WEIGHT", result.weightTonnes.toLocaleString() + " t"],
+                ["A4 CO₂", "+" + result.co2Kg.toLocaleString() + " kg CO₂e"],
+                ["SOURCE", "0.062 kg CO₂e/tonne-km · " + (result.usedFallback ? "Haversine" : "Google Routes API")],
+              ].map(([label, value]) => (
+                <div key={label}>
+                  <p className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#9CA3AF]">{label}</p>
+                  <p className={`text-xs font-medium mt-0.5 break-words ${label === "A4 CO₂" ? "text-[#1a4731]" : "text-foreground"}`}>
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className="px-3 py-3">
+              {saved ? (
+                <p className="text-[11px] text-[#1a4731] font-medium">
+                  ✓ A4 transport saved to project — total CO₂ updated
+                </p>
+              ) : (
+                <button
+                  onClick={handleSave}
+                  className="w-full text-xs font-semibold uppercase tracking-wider text-[#1a4731] border border-[#1a4731] rounded-sm px-3 py-1.5 hover:bg-[#F0FDF4] transition-colors"
+                >
+                  Save to project
+                </button>
+              )}
+            </div>
           </div>
         )}
       </div>
