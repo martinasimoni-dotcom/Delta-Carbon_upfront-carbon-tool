@@ -1,0 +1,36 @@
+MIT License
+
+Copyright (c) 2026 Delta Carbon
+Bhavana Priya, Martina Simoni, Rashi Desadla, Rim Choufani
+Institute for Advanced Architecture of Catalonia (IAAC), Barcelona
+MaAI01 — AI for Regenerative Design
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Carbon coefficient data sourced from BEDEC/ITeC (Institut de Tecnologia de la
+Construcció de Catalunya) via the 2050-materials API. Data is used for
+educational and research purposes under the terms of the respective data
+providers. Users are responsible for verifying data accuracy for any
+professional or regulatory application.
+
+This tool was developed as an academic research project at IAAC Barcelona and
+is not intended as a substitute for professional LCA assessment or regulatory
+compliance advice.
