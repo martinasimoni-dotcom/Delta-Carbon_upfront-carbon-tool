@@ -1,0 +1,657 @@
+{
+  "type": "FeatureCollection",
+  "name": "22@ District Development Plots (Poblenou)",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-A1",
+        "ref": "22@-A1",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "22@ District - Llacuna",
+        "max_height_m": 75,
+        "buildable_area_m2": 15125,
+        "use": "Creative Industries",
+        "street": "Avinguda Diagonal",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1936706908086117,
+              41.395252964426874
+            ],
+            [
+              2.1943293091913882,
+              41.395252964426874
+            ],
+            [
+              2.1943293091913882,
+              41.39574703557312
+            ],
+            [
+              2.1936706908086117,
+              41.39574703557312
+            ],
+            [
+              2.1936706908086117,
+              41.395252964426874
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-A2",
+        "ref": "22@-A2",
+        "area_m2": 3600,
+        "status": "available",
+        "zone": "22@ District - Llacuna",
+        "max_height_m": 90,
+        "buildable_area_m2": 10800,
+        "use": "Coworking Space",
+        "street": "Carrer de Pallars",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1941407519513114,
+              41.3955305066475
+            ],
+            [
+              2.194859248048689,
+              41.3955305066475
+            ],
+            [
+              2.194859248048689,
+              41.3960694933525
+            ],
+            [
+              2.1941407519513114,
+              41.3960694933525
+            ],
+            [
+              2.1941407519513114,
+              41.3955305066475
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-B1",
+        "ref": "22@-B1",
+        "area_m2": 2500,
+        "status": "occupied",
+        "zone": "22@ District - Poblenou Central",
+        "max_height_m": 100,
+        "buildable_area_m2": 12500,
+        "use": "Office / Tech Company",
+        "street": "Carrer de T\u00e0nger",
+        "building_name": "Media-TIC Building",
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1952006234019605,
+              41.39627542220626
+            ],
+            [
+              2.1957993765980395,
+              41.39627542220626
+            ],
+            [
+              2.1957993765980395,
+              41.39672457779375
+            ],
+            [
+              2.1952006234019605,
+              41.39672457779375
+            ],
+            [
+              2.1952006234019605,
+              41.39627542220626
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-B2",
+        "ref": "22@-B2",
+        "area_m2": 4225,
+        "status": "available",
+        "zone": "22@ District - Poblenou Central",
+        "max_height_m": 60,
+        "buildable_area_m2": 25350,
+        "use": "Startup Incubator",
+        "street": "Carrer de Zamora",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.195610807428621,
+              41.39670804886813
+            ],
+            [
+              2.196389192571379,
+              41.39670804886813
+            ],
+            [
+              2.196389192571379,
+              41.39729195113187
+            ],
+            [
+              2.195610807428621,
+              41.39729195113187
+            ],
+            [
+              2.195610807428621,
+              41.39670804886813
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-C1",
+        "ref": "22@-C1",
+        "area_m2": 4900,
+        "status": "available",
+        "zone": "22@ District - Parc del Centre",
+        "max_height_m": 85,
+        "buildable_area_m2": 29400,
+        "use": "R&D Facility",
+        "street": "Avinguda Diagonal",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1965808643795777,
+              41.39748559108875
+            ],
+            [
+              2.1974191356204225,
+              41.39748559108875
+            ],
+            [
+              2.1974191356204225,
+              41.39811440891124
+            ],
+            [
+              2.1965808643795777,
+              41.39811440891124
+            ],
+            [
+              2.1965808643795777,
+              41.39748559108875
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-C2",
+        "ref": "22@-C2",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "22@ District - Parc del Centre",
+        "max_height_m": 60,
+        "buildable_area_m2": 15125,
+        "use": "Office / Tech Company",
+        "street": "Carrer de Badajoz",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1974706766218923,
+              41.398052964426874
+            ],
+            [
+              2.1981293233781076,
+              41.398052964426874
+            ],
+            [
+              2.1981293233781076,
+              41.398547035573124
+            ],
+            [
+              2.1974706766218923,
+              41.398547035573124
+            ],
+            [
+              2.1974706766218923,
+              41.398052964426874
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-D1",
+        "ref": "22@-D1",
+        "area_m2": 6400,
+        "status": "occupied",
+        "zone": "22@ District - Tech Campus",
+        "max_height_m": 70,
+        "buildable_area_m2": 38400,
+        "use": "Innovation Center",
+        "street": "Carrer de Zamora",
+        "building_name": "Media-TIC Building",
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1980209790180343,
+              41.398640675530004
+            ],
+            [
+              2.198979020981966,
+              41.398640675530004
+            ],
+            [
+              2.198979020981966,
+              41.39935932447
+            ],
+            [
+              2.1980209790180343,
+              41.39935932447
+            ],
+            [
+              2.1980209790180343,
+              41.398640675530004
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-D2",
+        "ref": "22@-D2",
+        "area_m2": 3600,
+        "status": "available",
+        "zone": "22@ District - Tech Campus",
+        "max_height_m": 100,
+        "buildable_area_m2": 10800,
+        "use": "Coworking Space",
+        "street": "Carrer de Pallars",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1988407314995504,
+              41.399230506647505
+            ],
+            [
+              2.1995592685004492,
+              41.399230506647505
+            ],
+            [
+              2.1995592685004492,
+              41.3997694933525
+            ],
+            [
+              2.1988407314995504,
+              41.3997694933525
+            ],
+            [
+              2.1988407314995504,
+              41.399230506647505
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-E1",
+        "ref": "22@-E1",
+        "area_m2": 5625,
+        "status": "available",
+        "zone": "22@ District - Media-TIC",
+        "max_height_m": 80,
+        "buildable_area_m2": 16875,
+        "use": "Innovation Center",
+        "street": "Carrer de T\u00e0nger",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.199350907464239,
+              41.40016313330938
+            ],
+            [
+              2.2002490925357616,
+              41.40016313330938
+            ],
+            [
+              2.2002490925357616,
+              41.400836866690625
+            ],
+            [
+              2.199350907464239,
+              41.400836866690625
+            ],
+            [
+              2.199350907464239,
+              41.40016313330938
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-E2",
+        "ref": "22@-E2",
+        "area_m2": 4225,
+        "status": "available",
+        "zone": "22@ District - Media-TIC",
+        "max_height_m": 100,
+        "buildable_area_m2": 21125,
+        "use": "Office / Tech Company",
+        "street": "Carrer de Llull",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2001107834744733,
+              41.40070804886813
+            ],
+            [
+              2.2008892165255265,
+              41.40070804886813
+            ],
+            [
+              2.2008892165255265,
+              41.401291951131874
+            ],
+            [
+              2.2001107834744733,
+              41.401291951131874
+            ],
+            [
+              2.2001107834744733,
+              41.40070804886813
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-F1",
+        "ref": "22@-F1",
+        "area_m2": 4900,
+        "status": "occupied",
+        "zone": "22@ District - Innovation Hub",
+        "max_height_m": 85,
+        "buildable_area_m2": 19600,
+        "use": "Innovation Center",
+        "street": "Carrer de Llull",
+        "building_name": "Tech Campus Barcelona",
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2007808385817595,
+              41.40148559108876
+            ],
+            [
+              2.2016191614182405,
+              41.40148559108876
+            ],
+            [
+              2.2016191614182405,
+              41.402114408911245
+            ],
+            [
+              2.2007808385817595,
+              41.402114408911245
+            ],
+            [
+              2.2007808385817595,
+              41.40148559108876
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-F2",
+        "ref": "22@-F2",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "22@ District - Innovation Hub",
+        "max_height_m": 60,
+        "buildable_area_m2": 15125,
+        "use": "Office / Tech Company",
+        "street": "Carrer de Zamora",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2014706563516655,
+              41.40205296442687
+            ],
+            [
+              2.2021293436483345,
+              41.40205296442687
+            ],
+            [
+              2.2021293436483345,
+              41.40254703557312
+            ],
+            [
+              2.2014706563516655,
+              41.40254703557312
+            ],
+            [
+              2.2014706563516655,
+              41.40205296442687
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-G1",
+        "ref": "22@-G1",
+        "area_m2": 8100,
+        "status": "available",
+        "zone": "22@ District - Gl\u00f2ries",
+        "max_height_m": 70,
+        "buildable_area_m2": 24300,
+        "use": "R&D Facility",
+        "street": "Carrer de Pujades",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1884610682246524,
+              41.402595759971256
+            ],
+            [
+              2.1895389317753478,
+              41.402595759971256
+            ],
+            [
+              2.1895389317753478,
+              41.40340424002874
+            ],
+            [
+              2.1884610682246524,
+              41.40340424002874
+            ],
+            [
+              2.1884610682246524,
+              41.402595759971256
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-G2",
+        "ref": "22@-G2",
+        "area_m2": 3600,
+        "status": "available",
+        "zone": "22@ District - Gl\u00f2ries",
+        "max_height_m": 80,
+        "buildable_area_m2": 14400,
+        "use": "Office / Tech Company",
+        "street": "Carrer de Llull",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.189440709385234,
+              41.4032305066475
+            ],
+            [
+              2.190159290614766,
+              41.4032305066475
+            ],
+            [
+              2.190159290614766,
+              41.4037694933525
+            ],
+            [
+              2.189440709385234,
+              41.4037694933525
+            ],
+            [
+              2.189440709385234,
+              41.4032305066475
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-H1",
+        "ref": "22@-H1",
+        "area_m2": 2500,
+        "status": "available",
+        "zone": "22@ District - Mixed Use",
+        "max_height_m": 90,
+        "buildable_area_m2": 10000,
+        "use": "Creative Industries",
+        "street": "Carrer de Pallars",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.191700625704924,
+              41.395775422206256
+            ],
+            [
+              2.1922993742950765,
+              41.395775422206256
+            ],
+            [
+              2.1922993742950765,
+              41.396224577793745
+            ],
+            [
+              2.191700625704924,
+              41.396224577793745
+            ],
+            [
+              2.191700625704924,
+              41.395775422206256
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+# Environment files — never commit API keys
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+backend/.env
+backend/.env.*
+!backend/.env.example
+pipeline/**/.env
+pipeline/**/.env.*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Build outputs
+plugin/bin/
+plugin/obj/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rhino
+*.rhl

@@ -1,0 +1,1342 @@
+{
+  "type": "FeatureCollection",
+  "name": "Barcelona Development Plots - All Districts",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-A1",
+        "ref": "22@-A1",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "22@ District - Llacuna",
+        "max_height_m": 75,
+        "buildable_area_m2": 15125,
+        "use": "Creative Industries",
+        "street": "Avinguda Diagonal",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1936706908086117,
+              41.395252964426874
+            ],
+            [
+              2.1943293091913882,
+              41.395252964426874
+            ],
+            [
+              2.1943293091913882,
+              41.39574703557312
+            ],
+            [
+              2.1936706908086117,
+              41.39574703557312
+            ],
+            [
+              2.1936706908086117,
+              41.395252964426874
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-A2",
+        "ref": "22@-A2",
+        "area_m2": 3600,
+        "status": "available",
+        "zone": "22@ District - Llacuna",
+        "max_height_m": 90,
+        "buildable_area_m2": 10800,
+        "use": "Coworking Space",
+        "street": "Carrer de Pallars",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1941407519513114,
+              41.3955305066475
+            ],
+            [
+              2.194859248048689,
+              41.3955305066475
+            ],
+            [
+              2.194859248048689,
+              41.3960694933525
+            ],
+            [
+              2.1941407519513114,
+              41.3960694933525
+            ],
+            [
+              2.1941407519513114,
+              41.3955305066475
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-B2",
+        "ref": "22@-B2",
+        "area_m2": 4225,
+        "status": "available",
+        "zone": "22@ District - Poblenou Central",
+        "max_height_m": 60,
+        "buildable_area_m2": 25350,
+        "use": "Startup Incubator",
+        "street": "Carrer de Zamora",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.195610807428621,
+              41.39670804886813
+            ],
+            [
+              2.196389192571379,
+              41.39670804886813
+            ],
+            [
+              2.196389192571379,
+              41.39729195113187
+            ],
+            [
+              2.195610807428621,
+              41.39729195113187
+            ],
+            [
+              2.195610807428621,
+              41.39670804886813
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-C1",
+        "ref": "22@-C1",
+        "area_m2": 4900,
+        "status": "available",
+        "zone": "22@ District - Parc del Centre",
+        "max_height_m": 85,
+        "buildable_area_m2": 29400,
+        "use": "R&D Facility",
+        "street": "Avinguda Diagonal",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1965808643795777,
+              41.39748559108875
+            ],
+            [
+              2.1974191356204225,
+              41.39748559108875
+            ],
+            [
+              2.1974191356204225,
+              41.39811440891124
+            ],
+            [
+              2.1965808643795777,
+              41.39811440891124
+            ],
+            [
+              2.1965808643795777,
+              41.39748559108875
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-C2",
+        "ref": "22@-C2",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "22@ District - Parc del Centre",
+        "max_height_m": 60,
+        "buildable_area_m2": 15125,
+        "use": "Office / Tech Company",
+        "street": "Carrer de Badajoz",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1974706766218923,
+              41.398052964426874
+            ],
+            [
+              2.1981293233781076,
+              41.398052964426874
+            ],
+            [
+              2.1981293233781076,
+              41.398547035573124
+            ],
+            [
+              2.1974706766218923,
+              41.398547035573124
+            ],
+            [
+              2.1974706766218923,
+              41.398052964426874
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-D2",
+        "ref": "22@-D2",
+        "area_m2": 3600,
+        "status": "available",
+        "zone": "22@ District - Tech Campus",
+        "max_height_m": 100,
+        "buildable_area_m2": 10800,
+        "use": "Coworking Space",
+        "street": "Carrer de Pallars",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1988407314995504,
+              41.399230506647505
+            ],
+            [
+              2.1995592685004492,
+              41.399230506647505
+            ],
+            [
+              2.1995592685004492,
+              41.3997694933525
+            ],
+            [
+              2.1988407314995504,
+              41.3997694933525
+            ],
+            [
+              2.1988407314995504,
+              41.399230506647505
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-E1",
+        "ref": "22@-E1",
+        "area_m2": 5625,
+        "status": "available",
+        "zone": "22@ District - Media-TIC",
+        "max_height_m": 80,
+        "buildable_area_m2": 16875,
+        "use": "Innovation Center",
+        "street": "Carrer de T\u00e0nger",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.199350907464239,
+              41.40016313330938
+            ],
+            [
+              2.2002490925357616,
+              41.40016313330938
+            ],
+            [
+              2.2002490925357616,
+              41.400836866690625
+            ],
+            [
+              2.199350907464239,
+              41.400836866690625
+            ],
+            [
+              2.199350907464239,
+              41.40016313330938
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-E2",
+        "ref": "22@-E2",
+        "area_m2": 4225,
+        "status": "available",
+        "zone": "22@ District - Media-TIC",
+        "max_height_m": 100,
+        "buildable_area_m2": 21125,
+        "use": "Office / Tech Company",
+        "street": "Carrer de Llull",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2001107834744733,
+              41.40070804886813
+            ],
+            [
+              2.2008892165255265,
+              41.40070804886813
+            ],
+            [
+              2.2008892165255265,
+              41.401291951131874
+            ],
+            [
+              2.2001107834744733,
+              41.401291951131874
+            ],
+            [
+              2.2001107834744733,
+              41.40070804886813
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-F2",
+        "ref": "22@-F2",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "22@ District - Innovation Hub",
+        "max_height_m": 60,
+        "buildable_area_m2": 15125,
+        "use": "Office / Tech Company",
+        "street": "Carrer de Zamora",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2014706563516655,
+              41.40205296442687
+            ],
+            [
+              2.2021293436483345,
+              41.40205296442687
+            ],
+            [
+              2.2021293436483345,
+              41.40254703557312
+            ],
+            [
+              2.2014706563516655,
+              41.40254703557312
+            ],
+            [
+              2.2014706563516655,
+              41.40205296442687
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-G1",
+        "ref": "22@-G1",
+        "area_m2": 8100,
+        "status": "available",
+        "zone": "22@ District - Gl\u00f2ries",
+        "max_height_m": 70,
+        "buildable_area_m2": 24300,
+        "use": "R&D Facility",
+        "street": "Carrer de Pujades",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1884610682246524,
+              41.402595759971256
+            ],
+            [
+              2.1895389317753478,
+              41.402595759971256
+            ],
+            [
+              2.1895389317753478,
+              41.40340424002874
+            ],
+            [
+              2.1884610682246524,
+              41.40340424002874
+            ],
+            [
+              2.1884610682246524,
+              41.402595759971256
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-G2",
+        "ref": "22@-G2",
+        "area_m2": 3600,
+        "status": "available",
+        "zone": "22@ District - Gl\u00f2ries",
+        "max_height_m": 80,
+        "buildable_area_m2": 14400,
+        "use": "Office / Tech Company",
+        "street": "Carrer de Llull",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.189440709385234,
+              41.4032305066475
+            ],
+            [
+              2.190159290614766,
+              41.4032305066475
+            ],
+            [
+              2.190159290614766,
+              41.4037694933525
+            ],
+            [
+              2.189440709385234,
+              41.4037694933525
+            ],
+            [
+              2.189440709385234,
+              41.4032305066475
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "22@-H1",
+        "ref": "22@-H1",
+        "area_m2": 2500,
+        "status": "available",
+        "zone": "22@ District - Mixed Use",
+        "max_height_m": 90,
+        "buildable_area_m2": 10000,
+        "use": "Creative Industries",
+        "street": "Carrer de Pallars",
+        "building_name": null,
+        "district": "22@ Barcelona (Poblenou Innovation District)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.191700625704924,
+              41.395775422206256
+            ],
+            [
+              2.1922993742950765,
+              41.395775422206256
+            ],
+            [
+              2.1922993742950765,
+              41.396224577793745
+            ],
+            [
+              2.191700625704924,
+              41.396224577793745
+            ],
+            [
+              2.191700625704924,
+              41.395775422206256
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-01",
+        "ref": "EE-01",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 85,
+        "buildable_area_m2": 15125,
+        "use": "Residential",
+        "street": "Carrer de Guadiana"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1404707718370566,
+              41.379252964426875
+            ],
+            [
+              2.1411292281629435,
+              41.379252964426875
+            ],
+            [
+              2.1411292281629435,
+              41.379747035573125
+            ],
+            [
+              2.1404707718370566,
+              41.379747035573125
+            ],
+            [
+              2.1404707718370566,
+              41.379252964426875
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-02",
+        "ref": "EE-02",
+        "area_m2": 3600,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 60,
+        "buildable_area_m2": 10800,
+        "use": "Commercial",
+        "street": "Carrer de Sants"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.14094084034732,
+              41.379530506647505
+            ],
+            [
+              2.1416591596526806,
+              41.379530506647505
+            ],
+            [
+              2.1416591596526806,
+              41.3800694933525
+            ],
+            [
+              2.14094084034732,
+              41.3800694933525
+            ],
+            [
+              2.14094084034732,
+              41.379530506647505
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-03",
+        "ref": "EE-03",
+        "area_m2": 2704,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 85,
+        "buildable_area_m2": 13520,
+        "use": "Residential",
+        "street": "Carrer de Sants"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1414887263865188,
+              41.3799664390945
+            ],
+            [
+              2.142111273613481,
+              41.3799664390945
+            ],
+            [
+              2.142111273613481,
+              41.3804335609055
+            ],
+            [
+              2.1414887263865188,
+              41.3804335609055
+            ],
+            [
+              2.1414887263865188,
+              41.3799664390945
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-04",
+        "ref": "EE-04",
+        "area_m2": 3364,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 75,
+        "buildable_area_m2": 16820,
+        "use": "Commercial",
+        "street": "Carrer de Sants"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1419528080649104,
+              41.38033948975925
+            ],
+            [
+              2.14264719193509,
+              41.38033948975925
+            ],
+            [
+              2.14264719193509,
+              41.38086051024075
+            ],
+            [
+              2.1419528080649104,
+              41.38086051024075
+            ],
+            [
+              2.1419528080649104,
+              41.38033948975925
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-05",
+        "ref": "EE-05",
+        "area_m2": 4225,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 85,
+        "buildable_area_m2": 12675,
+        "use": "Commercial",
+        "street": "Carrer de Vallespir"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.142410903196774,
+              41.38070804886813
+            ],
+            [
+              2.1431890968032254,
+              41.38070804886813
+            ],
+            [
+              2.1431890968032254,
+              41.38129195113187
+            ],
+            [
+              2.142410903196774,
+              41.38129195113187
+            ],
+            [
+              2.142410903196774,
+              41.38070804886813
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-06",
+        "ref": "EE-06",
+        "area_m2": 2500,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 80,
+        "buildable_area_m2": 10000,
+        "use": "Residential",
+        "street": "Carrer de Vallespir"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1430006929257805,
+              41.381175422206255
+            ],
+            [
+              2.1435993070742194,
+              41.381175422206255
+            ],
+            [
+              2.1435993070742194,
+              41.381624577793744
+            ],
+            [
+              2.1430006929257805,
+              41.381624577793744
+            ],
+            [
+              2.1430006929257805,
+              41.381175422206255
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-07",
+        "ref": "EE-07",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 70,
+        "buildable_area_m2": 15125,
+        "use": "Mixed Use (Residential + Commercial)",
+        "street": "Carrer de Sants"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.143470760193252,
+              41.381552964426874
+            ],
+            [
+              2.144129239806748,
+              41.381552964426874
+            ],
+            [
+              2.144129239806748,
+              41.38204703557312
+            ],
+            [
+              2.143470760193252,
+              41.38204703557312
+            ],
+            [
+              2.143470760193252,
+              41.381552964426874
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-08",
+        "ref": "EE-08",
+        "area_m2": 3844,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 80,
+        "buildable_area_m2": 11532,
+        "use": "Office",
+        "street": "Carrer d'Esponceda"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.143928854662226,
+              41.38192152353575
+            ],
+            [
+              2.1446711453377736,
+              41.38192152353575
+            ],
+            [
+              2.1446711453377736,
+              41.38247847646424
+            ],
+            [
+              2.143928854662226,
+              41.38247847646424
+            ],
+            [
+              2.143928854662226,
+              41.38192152353575
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-09",
+        "ref": "EE-09",
+        "area_m2": 2304,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 70,
+        "buildable_area_m2": 9216,
+        "use": "Office",
+        "street": "Carrer de Sants"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1445126599065443,
+              41.382384405318
+            ],
+            [
+              2.145087340093456,
+              41.382384405318
+            ],
+            [
+              2.145087340093456,
+              41.38281559468199
+            ],
+            [
+              2.1445126599065443,
+              41.38281559468199
+            ],
+            [
+              2.1445126599065443,
+              41.382384405318
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "EE-10",
+        "ref": "EE-10",
+        "area_m2": 4900,
+        "status": "available",
+        "zone": "Eixample Esquerra - Esponceda",
+        "max_height_m": 85,
+        "buildable_area_m2": 24500,
+        "use": "Mixed Use (Residential + Commercial)",
+        "street": "Carrer de Riera Blanca"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.1448809597861453,
+              41.38268559108876
+            ],
+            [
+              2.145719040213855,
+              41.38268559108876
+            ],
+            [
+              2.145719040213855,
+              41.38331440891125
+            ],
+            [
+              2.1448809597861453,
+              41.38331440891125
+            ],
+            [
+              2.1448809597861453,
+              41.38268559108876
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-01",
+        "ref": "DM-01",
+        "area_m2": 3600,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 80,
+        "buildable_area_m2": 14400,
+        "use": "Commercial / Retail",
+        "street": "Rambla de Prim"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2164406706744133,
+              41.4102305066475
+            ],
+            [
+              2.217159329325587,
+              41.4102305066475
+            ],
+            [
+              2.217159329325587,
+              41.4107694933525
+            ],
+            [
+              2.2164406706744133,
+              41.4107694933525
+            ],
+            [
+              2.2164406706744133,
+              41.4102305066475
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-02",
+        "ref": "DM-02",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 110,
+        "buildable_area_m2": 18150,
+        "use": "Commercial / Retail",
+        "street": "Rambla de Prim"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2169706127567896,
+              41.41065296442687
+            ],
+            [
+              2.21762938724321,
+              41.41065296442687
+            ],
+            [
+              2.21762938724321,
+              41.41114703557312
+            ],
+            [
+              2.2169706127567896,
+              41.41114703557312
+            ],
+            [
+              2.2169706127567896,
+              41.41065296442687
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-03",
+        "ref": "DM-03",
+        "area_m2": 4225,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 120,
+        "buildable_area_m2": 16900,
+        "use": "Hotel + Residential",
+        "street": "Carrer de Llull"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2174107217702343,
+              41.411008048868126
+            ],
+            [
+              2.2181892782297656,
+              41.411008048868126
+            ],
+            [
+              2.2181892782297656,
+              41.41159195113187
+            ],
+            [
+              2.2174107217702343,
+              41.41159195113187
+            ],
+            [
+              2.2174107217702343,
+              41.411008048868126
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-04",
+        "ref": "DM-04",
+        "area_m2": 4900,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 120,
+        "buildable_area_m2": 29400,
+        "use": "Residential",
+        "street": "Avinguda Diagonal"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.217880774709713,
+              41.41138559108876
+            ],
+            [
+              2.2187192252902874,
+              41.41138559108876
+            ],
+            [
+              2.2187192252902874,
+              41.41201440891125
+            ],
+            [
+              2.217880774709713,
+              41.41201440891125
+            ],
+            [
+              2.217880774709713,
+              41.41138559108876
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-05",
+        "ref": "DM-05",
+        "area_m2": 3364,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 100,
+        "buildable_area_m2": 16820,
+        "use": "Residential",
+        "street": "Rambla de Prim"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.218452639763491,
+              41.41183948975925
+            ],
+            [
+              2.2191473602365086,
+              41.41183948975925
+            ],
+            [
+              2.2191473602365086,
+              41.41236051024075
+            ],
+            [
+              2.218452639763491,
+              41.41236051024075
+            ],
+            [
+              2.218452639763491,
+              41.41183948975925
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-06",
+        "ref": "DM-06",
+        "area_m2": 3844,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 80,
+        "buildable_area_m2": 23064,
+        "use": "Commercial / Retail",
+        "street": "Rambla de Prim"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.218928681598717,
+              41.412221523535756
+            ],
+            [
+              2.219671318401283,
+              41.412221523535756
+            ],
+            [
+              2.219671318401283,
+              41.41277847646425
+            ],
+            [
+              2.218928681598717,
+              41.41277847646425
+            ],
+            [
+              2.218928681598717,
+              41.412221523535756
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-07",
+        "ref": "DM-07",
+        "area_m2": 4624,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 110,
+        "buildable_area_m2": 27744,
+        "use": "Hotel + Residential",
+        "street": "Passeig del Taulat"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.219392745052174,
+              41.412594574200504
+            ],
+            [
+              2.2202072549478262,
+              41.412594574200504
+            ],
+            [
+              2.2202072549478262,
+              41.4132054257995
+            ],
+            [
+              2.219392745052174,
+              41.4132054257995
+            ],
+            [
+              2.219392745052174,
+              41.412594574200504
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-08",
+        "ref": "DM-08",
+        "area_m2": 3025,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 100,
+        "buildable_area_m2": 15125,
+        "use": "Hotel + Residential",
+        "street": "Passeig del Taulat"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2199706005873936,
+              41.413052964426875
+            ],
+            [
+              2.2206293994126063,
+              41.413052964426875
+            ],
+            [
+              2.2206293994126063,
+              41.413547035573124
+            ],
+            [
+              2.2199706005873936,
+              41.413547035573124
+            ],
+            [
+              2.2199706005873936,
+              41.413052964426875
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-09",
+        "ref": "DM-09",
+        "area_m2": 2704,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 90,
+        "buildable_area_m2": 10816,
+        "use": "Commercial / Retail",
+        "street": "Passeig del Taulat"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2156885846066308,
+              41.4095664390945
+            ],
+            [
+              2.2163114153933696,
+              41.4095664390945
+            ],
+            [
+              2.2163114153933696,
+              41.4100335609055
+            ],
+            [
+              2.2156885846066308,
+              41.4100335609055
+            ],
+            [
+              2.2156885846066308,
+              41.4095664390945
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "DM-10",
+        "ref": "DM-10",
+        "area_m2": 5625,
+        "status": "available",
+        "zone": "Diagonal Mar i el Front Mar\u00edtim",
+        "max_height_m": 120,
+        "buildable_area_m2": 22500,
+        "use": "Residential",
+        "street": "Rambla de Prim"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              2.2160508404171617,
+              41.40986313330938
+            ],
+            [
+              2.216949159582838,
+              41.40986313330938
+            ],
+            [
+              2.216949159582838,
+              41.41053686669063
+            ],
+            [
+              2.2160508404171617,
+              41.41053686669063
+            ],
+            [
+              2.2160508404171617,
+              41.40986313330938
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

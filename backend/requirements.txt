@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+anthropic
+openai
+python-dotenv
+requests
+aecdata
+pdfplumber
+pandas
+numpy
