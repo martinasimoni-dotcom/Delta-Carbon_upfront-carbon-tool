@@ -7,25 +7,65 @@ backend/.env.*
 !backend/.env.example
 pipeline/**/.env
 pipeline/**/.env.*
+.env
+.env.local
+.env.*.local
 
 # Python
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
 .venv/
 venv/
+area-volume-calculator/venv/
+env/
+ENV/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+*.cover
 
 # Node
+node_modules/
 frontend/node_modules/
+SurroundPlugin/Frontend/node_modules/
 frontend/dist/
+.next/
+.nuxt/
+*.log
+npm-debug.log*
 
-# Build outputs
-plugin/bin/
-plugin/obj/
+# Rhino plugin — source and build outputs
+plugin/
+SurroundPlugin/
+*.sln
+
+# Large geometry / model files
+*.obj
+*.rhl
+*.3dm
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Rhino
-*.rhl
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code (machine-specific — never commit)
+.claude/
+
+# Jupyter
+.ipynb_checkpoints/
