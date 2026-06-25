@@ -7,7 +7,7 @@ from pipeline.vtk_render import render_pretty
 
 HERE = Path(__file__).parent
 SITE = "22@ Poblenou, Barcelona, Spain"
-TITLE = "Engel House - SURROUND Material Study"
+TITLE = "Engel House - Delta Carbon Material Study"
 
 
 def main():

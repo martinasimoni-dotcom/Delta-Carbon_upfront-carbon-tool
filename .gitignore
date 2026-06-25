@@ -66,6 +66,8 @@ Thumbs.db
 
 # Claude Code (machine-specific — never commit)
 .claude/
+CLAUDE.md
+claude.md
 
 # Jupyter
 .ipynb_checkpoints/

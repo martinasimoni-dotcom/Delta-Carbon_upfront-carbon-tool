@@ -16,7 +16,7 @@ Early Carbon answers a single question for architects at the massing stage: *how
 
 ## How It Works
 
-1. **Rhino plugin** — architect types `SurroundSync` in Rhino. The plugin classifies geometry by layer name, computes volumes, and POSTs them to the frontend.
+1. **Rhino plugin** — architect types `DeltaCarbonSync` in Rhino. The plugin classifies geometry by layer name, computes volumes, and POSTs them to the frontend.
 2. **Frontend** — React/Vite app receives the model, shows a live 3D viewer, and calculates carbon per element using BEDEC/ITeC coefficients.
 3. **AI suggestions** — architect clicks "Optimise" on any element. The frontend calls the FastAPI backend, which queries the 2050-materials API live (`country="ES"`), passes results to Claude (`claude-sonnet-4-6`), and returns 3–5 ranked alternatives with CO₂ delta figures.
 4. **Supplier matching** — architect searches a supplier. Road distance is calculated via Google Maps Distance Matrix; transport CO₂ = distance × material weight × 0.062 kg CO₂e/t·km.
@@ -27,7 +27,7 @@ Early Carbon answers a single question for architects at the massing stage: *how
 ## Project Structure
 
 ```
-├── plugin/                  Rhino C# plugin (SurroundSync, DeltaCarbonSync commands)
+├── plugin/                  Rhino C# plugin (DeltaCarbonSync, DeltaCarbonSync commands)
 │   ├── Commands/            Per-command C# files
 │   ├── Core/                APIClient, CarbonCalculator, GeometryAnalyzer
 │   └── UI/                  Docked Rhino panel
@@ -101,10 +101,10 @@ Both must be running simultaneously for AI suggestions to work.
 
 ```powershell
 cd plugin
-dotnet build -c Debug    # → bin/Debug/net48/SurroundPlugin.rhp
+dotnet build -c Debug    # → bin/Debug/net48/DeltaCarbon.rhp
 ```
 
-Drag `SurroundPlugin.rhp` onto the Rhino viewport. Type `SurroundSync` in the Rhino command line to push geometry to the web app.
+Drag `DeltaCarbon.rhp` onto the Rhino viewport. Type `DeltaCarbonSync` in the Rhino command line to push geometry to the web app.
 
 ---
 

@@ -148,7 +148,7 @@ def jump_line(ax, x0, y0, x1, y1, jump_x, jump_radius=0.18,
 # ══════════════════════════════════════════════════════════════════════════════
 ax.add_patch(FancyBboxPatch((0.3, 14.1), 21.4, 0.7,
     boxstyle="round,pad=0", linewidth=0, facecolor=C["navy"], zorder=2))
-ax.text(11, 14.45, "SURROUND / DELTA CARBON  —  System Architecture & Data Flow",
+ax.text(11, 14.45, "DELTA CARBON  —  System Architecture & Data Flow",
         ha="center", va="center", fontsize=13, fontweight="bold",
         color="white", zorder=3)
 
@@ -175,7 +175,7 @@ for y in [13.9, 9.5, 5.2, 2.0]:
 # ── INPUTS ───────────────────────────────────────────────────────────────────
 box(ax, 0.5, 10.4, 3.2, 3.2,
     "RHINO 3D",
-    ["SurroundSync C# plugin", "Classifies geometry", "by layer keyword",
+    ["DeltaCarbonSync C# plugin", "Classifies geometry", "by layer keyword",
      "Computes volumes", "POST to :5173"],
     fill=C["blue_light"], title_bg=C["navy"], edge=C["navy"])
 

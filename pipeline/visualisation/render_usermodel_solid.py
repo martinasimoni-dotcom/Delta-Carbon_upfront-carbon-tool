@@ -56,7 +56,7 @@ def main():
     rw.Render()
     w2i = vtk.vtkWindowToImageFilter(); w2i.SetInput(rw); w2i.ReadFrontBufferOff(); w2i.Update()
     img = VR._vtk_image_to_pil(w2i.GetOutput())
-    img = VR._add_titles(img, "SURROUND - Massing Model (geometry check)", "Metal=grey  brick=red  black=dark")
+    img = VR._add_titles(img, "Delta Carbon - Massing Model (geometry check)", "Metal=grey  brick=red  black=dark")
     out = HERE / "output" / "usermodel_solid.png"
     img.save(out); print("->", out)
 

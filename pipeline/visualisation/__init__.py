@@ -1,5 +1,5 @@
 """
-Surround Stage 4 — Visualisation pipeline (Rim).
+Delta Carbon Stage 4 — Visualisation pipeline (Rim).
 
 Takes the Material Comparative Table from Stage 3 (Bhavana) and, per surface:
   1. selects the best material choice,

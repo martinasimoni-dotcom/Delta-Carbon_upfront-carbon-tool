@@ -173,7 +173,7 @@ def main():
         VR._setup_passes(r); rw.Render()
         w2i = vtk.vtkWindowToImageFilter(); w2i.SetInput(rw); w2i.ReadFrontBufferOff(); w2i.Update()
         img = VR._postprocess(VR._vtk_image_to_pil(w2i.GetOutput()))
-        img = VR._add_titles(img, "SURROUND - Massing Model", SITE)
+        img = VR._add_titles(img, "Delta Carbon - Massing Model", SITE)
         img = VR._add_legend(img, legend)
         img.save(out); print("rendered", Path(out).name)
 

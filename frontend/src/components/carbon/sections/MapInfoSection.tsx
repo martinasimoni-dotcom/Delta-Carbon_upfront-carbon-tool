@@ -154,7 +154,7 @@ export function MapInfoSection() {
             ) : (
               <div className="mt-3 space-y-2">
                 <div className="flex items-center gap-2 rounded-md bg-[#E8F5E9] px-3 py-2 text-xs font-medium text-[#2C5F4C]">
-                  <span>✓</span> Plot sent — run <span className="font-mono font-bold">SurroundSetOrigin</span> in Rhino
+                  <span>✓</span> Plot sent — run <span className="font-mono font-bold">DeltaCarbonSetOrigin</span> in Rhino
                 </div>
                 <div className="text-[10px] text-muted-foreground">
                   Then build your model at (0,0,0) and run <span className="font-mono font-bold">DeltaCarbonSync</span> to sync.

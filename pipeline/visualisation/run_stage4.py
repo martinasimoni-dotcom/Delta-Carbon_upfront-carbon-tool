@@ -1,5 +1,5 @@
 """
-SURROUND — Stage 4 (Rim) end-to-end, built to run INDEPENDENTLY.
+Delta Carbon — Stage 4 (Rim) end-to-end, built to run INDEPENDENTLY.
 
 Inputs are self-contained so this runs without the other teammates' code:
   - sample_data/comparative_table.csv  (stand-in for Bhavana's Stage 3 output)
@@ -40,7 +40,7 @@ from pipeline.texture_scraper import get_texture
 
 load_dotenv()
 
-PROJECT_NAME = "SURROUND Massing — Material Study"
+PROJECT_NAME = "Delta Carbon Massing — Material Study"
 SITE_LOCATION = "22@ Poblenou, Barcelona, Spain"
 BUILDING_TYPE = "Residential"
 

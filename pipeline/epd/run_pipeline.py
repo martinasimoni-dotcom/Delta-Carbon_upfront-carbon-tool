@@ -1,5 +1,5 @@
 """
-Surround Stage 3 — Material Carbon Analysis Pipeline
+Delta Carbon Stage 3 — Material Carbon Analysis Pipeline
 Entry point that wires all 7 steps together into a single run.
 
 Usage:
