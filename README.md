@@ -1,4 +1,4 @@
-# Early Carbon
+# DELTA CARBON
 
 > Massing-stage upfront carbon assessment tool for architects — import a Rhino model, assign materials, get AI-powered alternatives from the BEDEC/ITeC database, match suppliers, and download a carbon passport before any structural decision is locked in.
 
